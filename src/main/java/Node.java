@@ -1,5 +1,6 @@
 import org.apache.commons.cli.*;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -7,13 +8,30 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashSet;
 import java.util.Set;
 
+
 public class Node implements NodeInterface {
 
-    Node nextNode;
-    Node prevNode;
-    Node leaderNode;
+    NodeInterface nextNode;
+    NodeInterface prevNode;
+    NodeInterface leaderNode;
     Set<NodeInterface> allNodes = new HashSet<>();
+    String name;
+    Registry registry;
 
+    public Node(String name, Registry registry, int objectPort) {
+        this.name = name;
+        this.registry = registry;
+        pushNodeToRegistry(objectPort);
+    }
+
+    /**
+     * jenom pro zjednodušení abych to furt nevypisoval jak blbec
+     */
+    private static void createOpts(String opt, String longOpt, boolean hasArg, String description, boolean required, Options options) {
+        Option option = new Option(opt, longOpt, hasArg, description);
+        option.setRequired(required);
+        options.addOption(option);
+    }
 
     /**
      * @param args nastaveno jako konzolová aplikace, která přijme options
@@ -24,21 +42,12 @@ public class Node implements NodeInterface {
 //        System.out.println("Hello World!");
 //        Arrays.stream(args).forEach(System.out::println);
         Options options = new Options();
-        Option targetOption = new Option("t", "target", true, "Target node name.");
-        targetOption.setRequired(false);
-        options.addOption(targetOption);
-
-        Option nameOption = new Option("n", "name", true, "Name of your node, which will be written into RMI registry.");
-        nameOption.setRequired(true);
-        options.addOption(nameOption);
-
-        Option registryPortOption = new Option("p", "portRegistry", true, "RMI registry port. If not set using port 2010.");
-        registryPortOption.setRequired(false);
-        options.addOption(registryPortOption);
-
-        Option registryHostOption = new Option("h", "hostRegistry", true, "RMI registry host. If not set using localhost.");
-        registryHostOption.setRequired(false);
-        options.addOption(registryHostOption);
+        createOpts("t", "target", true, "Target node name.", false, options);
+        createOpts("n", "name", true, "Name of your node, which will be written into RMI registry.", true, options);
+        createOpts("rp", "registryPort", true, "RMI registry port. If not set using port 2010.", false, options);
+        createOpts("rh", "registryHost", true, "RMI registry host. If not set using localhost.", false, options);
+        createOpts("p", "port", true, "Port on which this node will be listening.", true, options);
+        createOpts("d", "debug", false, "Option for debug mode. NOT YET WORKING", false, options);
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
@@ -56,35 +65,41 @@ public class Node implements NodeInterface {
 
         String nodeTarget = cmd.getOptionValue("target");
         String nodeName = cmd.getOptionValue("name");
-        String rmiRegPort = cmd.getOptionValue("portRegistry");
-        String rmiRegHost = cmd.getOptionValue("hostRegistry");
+        int rmiRegPort;
+        if(cmd.hasOption("registryPort")){
+            rmiRegPort = Integer.parseInt(cmd.getOptionValue("registryPort"));
+        }else {
+            rmiRegPort = 0;
+        }
+        String rmiRegHost = cmd.getOptionValue("registryHost");
+        int port = Integer.parseInt(cmd.getOptionValue("port"));
         System.out.println(nodeName);
 
-        if (rmiRegPort == null) {
-            rmiRegPort = "2010";
+        if (rmiRegPort == 0) {
+            rmiRegPort = 1099;
         }
         if (rmiRegHost == null) {
             rmiRegHost = "localhost";
         }
 
         System.out.println(String.format("Using RMI Registry host: %s:%s", rmiRegHost, rmiRegPort));
+        // getting RMI registry
 
-        Node node = new Node();
-
-
-        //adding node to RMI registry
-        try {
-            NodeInterface stub =
-                    (NodeInterface) UnicastRemoteObject.exportObject(node, 50000);
-            Registry registry = LocateRegistry.createRegistry(Integer.parseInt(rmiRegPort));
-            registry.rebind(nodeName, stub);
-        } catch (NumberFormatException e) {
-            System.err.println("Port must be an Integer!");
-        } catch (Exception e) {
-            // Something is wrong ...
-            System.err.println("Server - something is wrong: " + e.getMessage());
+        Registry registry = null;
+        try{
+            if(nodeTarget==null){
+                registry = LocateRegistry.createRegistry(rmiRegPort);
+            }else {
+                registry = LocateRegistry.getRegistry(rmiRegHost,rmiRegPort);
+            }
+        } catch (RemoteException e) {
             e.printStackTrace();
+            System.err.println("Could not create or locate RMI Registry on given host and port.");
+            System.exit(1);
         }
+
+
+        Node node = new Node(nodeName, registry, port);
         System.out.println(String.format("Node %s is now running.", nodeName));
         if (nodeTarget == null) {
             node.becomeLeader();
@@ -93,8 +108,29 @@ public class Node implements NodeInterface {
         }
     }
 
-    private void connectToAnotherNode(String nodeTarget) {
+    private void pushNodeToRegistry(int objectPort) {
+        try {
+            NodeInterface stub = (NodeInterface) UnicastRemoteObject.exportObject(this, objectPort);
+            registry.rebind(name, stub);
+            System.out.println("Node pushed into registry.");
+        } catch (RemoteException e) {
+            System.err.println("Something went wrong. Try it again.");
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
 
+    private void connectToAnotherNode(String nodeTarget) {
+        try {
+            NodeInterface hostNode;
+            hostNode = (NodeInterface) registry.lookup(nodeTarget);
+            hostNode.printName();
+//            this.nextNode = node.getNext();
+//            this.prevNode = node.get
+        } catch (RemoteException | NotBoundException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     private void becomeLeader() {
@@ -120,6 +156,26 @@ public class Node implements NodeInterface {
     @Override
     public void changePrev(NodeInterface prev) throws RemoteException {
 
+    }
+
+    @Override
+    public NodeInterface getPrev() throws RemoteException {
+        return this.prevNode;
+    }
+
+    @Override
+    public NodeInterface getNext() throws RemoteException {
+        return this.nextNode;
+    }
+
+    @Override
+    public NodeInterface getLeader() throws RemoteException {
+        return this.leaderNode;
+    }
+
+    @Override
+    public void printName() throws RemoteException {
+        System.out.println(this.name);
     }
 
 }

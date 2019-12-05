@@ -14,7 +14,13 @@ public interface NodeInterface extends Remote {
 
     void changePrev(NodeInterface prev) throws RemoteException;
 
+    NodeInterface getPrev() throws RemoteException;
 
+    NodeInterface getNext() throws RemoteException;
+
+    NodeInterface getLeader() throws RemoteException;
+
+    void printName() throws RemoteException;
 //
 //    void registerClient(String name, NodeInterface node);
 //
