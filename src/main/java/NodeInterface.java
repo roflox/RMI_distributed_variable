@@ -20,7 +20,13 @@ public interface NodeInterface extends Remote {
 
     NodeInterface getLeader() throws RemoteException;
 
-    void printName() throws RemoteException;
+    void connected(String name) throws RemoteException;
+
+    String getName() throws RemoteException;
+
+    void printNeighbors() throws RemoteException;
+
+    void changeLeader(NodeInterface leader) throws RemoteException;
 //
 //    void registerClient(String name, NodeInterface node);
 //

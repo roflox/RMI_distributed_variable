@@ -66,14 +66,14 @@ public class Node implements NodeInterface {
         String nodeTarget = cmd.getOptionValue("target");
         String nodeName = cmd.getOptionValue("name");
         int rmiRegPort;
-        if(cmd.hasOption("registryPort")){
+        if (cmd.hasOption("registryPort")) {
             rmiRegPort = Integer.parseInt(cmd.getOptionValue("registryPort"));
-        }else {
+        } else {
             rmiRegPort = 0;
         }
         String rmiRegHost = cmd.getOptionValue("registryHost");
         int port = Integer.parseInt(cmd.getOptionValue("port"));
-        System.out.println(nodeName);
+//        System.out.println(nodeName);
 
         if (rmiRegPort == 0) {
             rmiRegPort = 1099;
@@ -86,11 +86,11 @@ public class Node implements NodeInterface {
         // getting RMI registry
 
         Registry registry = null;
-        try{
-            if(nodeTarget==null){
+        try {
+            if (nodeTarget == null) {
                 registry = LocateRegistry.createRegistry(rmiRegPort);
-            }else {
-                registry = LocateRegistry.getRegistry(rmiRegHost,rmiRegPort);
+            } else {
+                registry = LocateRegistry.getRegistry(rmiRegHost, rmiRegPort);
             }
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -122,11 +122,8 @@ public class Node implements NodeInterface {
 
     private void connectToAnotherNode(String nodeTarget) {
         try {
-            NodeInterface hostNode;
-            hostNode = (NodeInterface) registry.lookup(nodeTarget);
-            hostNode.printName();
-//            this.nextNode = node.getNext();
-//            this.prevNode = node.get
+            NodeInterface hostNode = (NodeInterface) registry.lookup(nodeTarget);
+            hostNode.join(this.name, this);
         } catch (RemoteException | NotBoundException e) {
             e.printStackTrace();
             System.exit(1);
@@ -146,16 +143,33 @@ public class Node implements NodeInterface {
 
     @Override
     public void join(String name, NodeInterface node) throws RemoteException {
-
+        System.out.println(String.format("Node %s is connecting.", name));
+        node.changeNext(this.nextNode);
+        this.nextNode.changePrev(node);
+        node.changePrev(this);
+        this.nextNode = node;
+        node.changeLeader(this.leaderNode);
+//        node.connected(this.name);
+        node.printNeighbors();
+        System.out.println("Prev: " + this.prevNode.getName() + " Next: " + this.nextNode.getName());
     }
 
     @Override
     public void changeNext(NodeInterface next) throws RemoteException {
+        this.nextNode = next;
+        System.out.println();
+        if (this.prevNode != null && this.nextNode != null) {
+            printNeighbors();
+        }
     }
 
     @Override
     public void changePrev(NodeInterface prev) throws RemoteException {
-
+        this.prevNode = prev;
+        System.out.println();
+        if (this.prevNode != null && this.nextNode != null) {
+            printNeighbors();
+        }
     }
 
     @Override
@@ -174,8 +188,24 @@ public class Node implements NodeInterface {
     }
 
     @Override
-    public void printName() throws RemoteException {
-        System.out.println(this.name);
+    public void connected(String name) throws RemoteException {
+        System.out.println(String.format("Connected to node %s", name));
+    }
+
+    @Override
+    public String getName() throws RemoteException {
+        return this.name;
+    }
+
+    @Override
+    public void printNeighbors() throws RemoteException {
+        System.out.println("Prev: " + this.prevNode.getName() + " Next: " + this.nextNode.getName());
+    }
+
+    @Override
+    public void changeLeader(NodeInterface leader) throws RemoteException {
+        this.leaderNode = leader;
+        System.out.println("Leader: " + this.leaderNode.getName());
     }
 
 }
