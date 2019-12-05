@@ -144,32 +144,26 @@ public class Node implements NodeInterface {
     @Override
     public void join(String name, NodeInterface node) throws RemoteException {
         System.out.println(String.format("Node %s is connecting.", name));
+        node.changeLeader(this.leaderNode);
         node.changeNext(this.nextNode);
         this.nextNode.changePrev(node);
         node.changePrev(this);
         this.nextNode = node;
-        node.changeLeader(this.leaderNode);
-//        node.connected(this.name);
         node.printNeighbors();
-        System.out.println("Prev: " + this.prevNode.getName() + " Next: " + this.nextNode.getName());
+        node.getNext().printNeighbors();
+        if(!node.getNext().equals(node.getPrev())) node.getPrev().printNeighbors();
     }
 
     @Override
     public void changeNext(NodeInterface next) throws RemoteException {
         this.nextNode = next;
-        System.out.println();
-        if (this.prevNode != null && this.nextNode != null) {
-            printNeighbors();
-        }
+//        printNeighbors();
     }
 
     @Override
     public void changePrev(NodeInterface prev) throws RemoteException {
         this.prevNode = prev;
-        System.out.println();
-        if (this.prevNode != null && this.nextNode != null) {
-            printNeighbors();
-        }
+//        printNeighbors();
     }
 
     @Override
@@ -199,13 +193,22 @@ public class Node implements NodeInterface {
 
     @Override
     public void printNeighbors() throws RemoteException {
-        System.out.println("Prev: " + this.prevNode.getName() + " Next: " + this.nextNode.getName());
+        StringBuilder sb = new StringBuilder("\n");
+        if(this.nextNode!=null){
+            sb.append("Next: ").append(this.nextNode.getName()).append(", ");
+        }
+        if(this.prevNode!=null){
+            sb.append("Prev: ").append(this.prevNode.getName()).append(", ");
+        }
+        if(this.leaderNode!=null){
+            sb.append("Leader: ").append(this.leaderNode.getName());
+        }
+        System.out.println(sb.toString());
     }
 
     @Override
     public void changeLeader(NodeInterface leader) throws RemoteException {
         this.leaderNode = leader;
-        System.out.println("Leader: " + this.leaderNode.getName());
     }
 
 }

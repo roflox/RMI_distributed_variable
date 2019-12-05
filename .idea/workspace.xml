@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="fb126565-4587-42e0-a95a-607aa9c566a1" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/src/main/java/Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Node.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="Interface" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IgnoredFileRootStore">
+    <option name="generatedRoots">
+      <set>
+        <option value="C:\School\DSV\RMI_distributed_variable\.idea" />
+      </set>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="$APPLICATION_HOME_DIR$/plugins/maven/lib/maven3" />
+      </MavenGeneralSettings>
+    </option>
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1UWUtGwUuwHKE5gCauncbUXer5H" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="Downloaded.Files.Path.Enabled" value="false" />
+    <property name="Repository.Attach.Annotations" value="false" />
+    <property name="Repository.Attach.JavaDocs" value="false" />
+    <property name="Repository.Attach.Sources" value="false" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
+  </component>
+  <component name="RunManager" selected="Application.Node5">
+    <configuration name="Node1" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="Node" />
+      <module name="RMI_distributed_variable" />
+      <option name="PROGRAM_PARAMETERS" value="--name Node1 -p 50000" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Node2" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Node" />
+      <module name="RMI_distributed_variable" />
+      <option name="PROGRAM_PARAMETERS" value="--name Node2 -p 50001 -t Node1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Node3" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Node" />
+      <module name="RMI_distributed_variable" />
+      <option name="PROGRAM_PARAMETERS" value="--name Node3 -p 50002 -t Node2" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Node4" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Node" />
+      <module name="RMI_distributed_variable" />
+      <option name="PROGRAM_PARAMETERS" value="--name Node4 -p 50003 -t Node1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Node5" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Node" />
+      <module name="RMI_distributed_variable" />
+      <option name="PROGRAM_PARAMETERS" value="--name Node5 -p 50004 -t Node3" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.Node2" />
+      <item itemvalue="Application.Node5" />
+      <item itemvalue="Application.Node3" />
+      <item itemvalue="Application.Node4" />
+      <item itemvalue="Application.Node1" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Node1" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="fb126565-4587-42e0-a95a-607aa9c566a1" name="Default Changelist" comment="" />
+      <created>1575472057576</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1575472057576</updated>
+      <workItem from="1575472063865" duration="15746000" />
+      <workItem from="1575499199196" duration="132000" />
+      <workItem from="1575551486410" duration="11659000" />
+    </task>
+    <task id="LOCAL-00001" summary="fungujici vytvorene spojeni mezi dvemi nody">
+      <created>1575557603286</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1575557603286</updated>
+    </task>
+    <task id="LOCAL-00002" summary="fungující vytvoření kruhu">
+      <created>1575571951259</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1575571951259</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
+    <MESSAGE value="fungujici vytvorene spojeni mezi dvemi nody" />
+    <MESSAGE value="fungující vytvoření kruhu" />
+    <option name="LAST_COMMIT_MESSAGE" value="fungující vytvoření kruhu" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="677" y="178" key="#Node" timestamp="1575499247090">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="677" y="178" key="#Node/0.0.1920.1040@0.0.1920.1040" timestamp="1575499247090" />
+    <state x="1032" y="181" key="#Project_Structure" timestamp="1575474127143">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1032" y="181" key="#Project_Structure/0.0.1920.1040@0.0.1920.1040" timestamp="1575474127143" />
+    <state x="474" y="349" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1575572895867">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="474" y="349" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1575572895867" />
+    <state x="765" y="235" key="#com.intellij.ide.util.MemberChooser" timestamp="1575564272856">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="765" y="235" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1575564272856" />
+    <state x="1039" y="393" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1575499278972">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1039" y="393" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1575499278972" />
+    <state x="852" y="337" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog" timestamp="1575474348471">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="852" y="337" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1575474348470" />
+    <state x="327" y="116" key="CommitChangelistDialog2" timestamp="1575572930736">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="327" y="116" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1575572930736" />
+    <state x="876" y="298" key="DetectedRootsChooserDialog" timestamp="1575474370452">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="876" y="298" key="DetectedRootsChooserDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1575474370452" />
+    <state x="902" y="337" key="FileChooserDialogImpl" timestamp="1575479365217">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="902" y="337" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1575479365217" />
+    <state width="1354" height="281" key="GridCell.Tab.0.bottom" timestamp="1575572919868">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1354" height="281" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1575572919868" />
+    <state width="1354" height="281" key="GridCell.Tab.0.center" timestamp="1575572919868">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1354" height="281" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1575572919868" />
+    <state width="1354" height="281" key="GridCell.Tab.0.left" timestamp="1575572919868">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1354" height="281" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1575572919868" />
+    <state width="1354" height="281" key="GridCell.Tab.0.right" timestamp="1575572919868">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1354" height="281" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1575572919868" />
+    <state x="602" y="157" key="SettingsEditor" timestamp="1575499262986">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="602" y="157" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1575499262986" />
+    <state x="307" y="256" key="Vcs.Push.Dialog.v2" timestamp="1575557605729">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="307" y="256" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1575557605729" />
+    <state x="826" y="476" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1575474292094">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="826" y="476" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/0.0.1920.1040@0.0.1920.1040" timestamp="1575474292094" />
+    <state x="371" y="244" key="run.anything.popup" timestamp="1575554893647">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="371" y="244" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1575554893647" />
+    <state x="143" y="230" width="672" height="678" key="search.everywhere.popup" timestamp="1575559750848">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="143" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1575559750848" />
+  </component>
+</project>
