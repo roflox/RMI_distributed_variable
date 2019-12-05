@@ -17,6 +17,7 @@ public class Node implements NodeInterface {
     Set<NodeInterface> allNodes = new HashSet<>();
     String name;
     Registry registry;
+    int id;
 
     public Node(String name, Registry registry, int objectPort) {
         this.name = name;
@@ -37,6 +38,10 @@ public class Node implements NodeInterface {
      * @param args nastaveno jako konzolová aplikace, která přijme options
      *             -t --target cílový node, ke kterému se má nově spuštěný node připojit
      *             -n --name jméno nově vzniklého nodu
+     *             -rp --registryPort port kde běží RMI registry
+     *             -rh --registryHost adresa kde běží RMI registry
+     *             -p --port port kde bude vystavený Proxy objekt
+     *             -d --debug spuštění debug módu
      */
     public static void main(String[] args) {
 //        System.out.println("Hello World!");
@@ -73,7 +78,6 @@ public class Node implements NodeInterface {
         }
         String rmiRegHost = cmd.getOptionValue("registryHost");
         int port = Integer.parseInt(cmd.getOptionValue("port"));
-//        System.out.println(nodeName);
 
         if (rmiRegPort == 0) {
             rmiRegPort = 1099;
@@ -83,8 +87,8 @@ public class Node implements NodeInterface {
         }
 
         System.out.println(String.format("Using RMI Registry host: %s:%s", rmiRegHost, rmiRegPort));
-        // getting RMI registry
 
+        // getting RMI registry
         Registry registry = null;
         try {
             if (nodeTarget == null) {
@@ -139,6 +143,7 @@ public class Node implements NodeInterface {
         if (allNodes.isEmpty()) {
             allNodes.add(this);
         }
+        id = 1;
     }
 
     @Override
@@ -151,19 +156,18 @@ public class Node implements NodeInterface {
         this.nextNode = node;
         node.printNeighbors();
         node.getNext().printNeighbors();
-        if(!node.getNext().equals(node.getPrev())) node.getPrev().printNeighbors();
+        this.leaderNode.joinSet(node);
+        if (!node.getNext().equals(node.getPrev())) node.getPrev().printNeighbors();
     }
 
     @Override
     public void changeNext(NodeInterface next) throws RemoteException {
         this.nextNode = next;
-//        printNeighbors();
     }
 
     @Override
     public void changePrev(NodeInterface prev) throws RemoteException {
         this.prevNode = prev;
-//        printNeighbors();
     }
 
     @Override
@@ -182,11 +186,6 @@ public class Node implements NodeInterface {
     }
 
     @Override
-    public void connected(String name) throws RemoteException {
-        System.out.println(String.format("Connected to node %s", name));
-    }
-
-    @Override
     public String getName() throws RemoteException {
         return this.name;
     }
@@ -194,13 +193,13 @@ public class Node implements NodeInterface {
     @Override
     public void printNeighbors() throws RemoteException {
         StringBuilder sb = new StringBuilder("\n");
-        if(this.nextNode!=null){
+        if (this.nextNode != null) {
             sb.append("Next: ").append(this.nextNode.getName()).append(", ");
         }
-        if(this.prevNode!=null){
+        if (this.prevNode != null) {
             sb.append("Prev: ").append(this.prevNode.getName()).append(", ");
         }
-        if(this.leaderNode!=null){
+        if (this.leaderNode != null) {
             sb.append("Leader: ").append(this.leaderNode.getName());
         }
         System.out.println(sb.toString());
@@ -209,6 +208,22 @@ public class Node implements NodeInterface {
     @Override
     public void changeLeader(NodeInterface leader) throws RemoteException {
         this.leaderNode = leader;
+    }
+
+    @Override
+    public void joinSet(NodeInterface node) throws RemoteException {
+        this.allNodes.add(node);
+        node.setId(allNodes.size());
+    }
+
+    @Override
+    public int getId() throws RemoteException {
+        return this.id;
+    }
+
+    @Override
+    public void setId(int id) throws RemoteException {
+        this.id = id;
     }
 
 }

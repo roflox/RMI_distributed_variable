@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fb126565-4587-42e0-a95a-607aa9c566a1" name="Default Changelist" comment="">
+    <list default="true" id="fb126565-4587-42e0-a95a-607aa9c566a1" name="Default Changelist" comment="přidání IDček">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Node.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/NodeInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/NodeInterface.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -140,7 +143,7 @@
       <updated>1575472057576</updated>
       <workItem from="1575472063865" duration="15746000" />
       <workItem from="1575499199196" duration="132000" />
-      <workItem from="1575551486410" duration="11659000" />
+      <workItem from="1575551486410" duration="13550000" />
     </task>
     <task id="LOCAL-00001" summary="fungujici vytvorene spojeni mezi dvemi nody">
       <created>1575557603286</created>
@@ -156,7 +159,14 @@
       <option name="project" value="LOCAL" />
       <updated>1575571951259</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="fungující vytvoření kruhu">
+      <created>1575572975603</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1575572975603</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -166,7 +176,8 @@
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
     <MESSAGE value="fungujici vytvorene spojeni mezi dvemi nody" />
     <MESSAGE value="fungující vytvoření kruhu" />
-    <option name="LAST_COMMIT_MESSAGE" value="fungující vytvoření kruhu" />
+    <MESSAGE value="přidání IDček" />
+    <option name="LAST_COMMIT_MESSAGE" value="přidání IDček" />
   </component>
   <component name="WindowStateProjectService">
     <state x="677" y="178" key="#Node" timestamp="1575499247090">
@@ -181,10 +192,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="474" y="349" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1575572895867" />
-    <state x="765" y="235" key="#com.intellij.ide.util.MemberChooser" timestamp="1575564272856">
+    <state x="765" y="235" key="#com.intellij.ide.util.MemberChooser" timestamp="1575573518277">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="765" y="235" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1575564272856" />
+    <state x="765" y="235" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1575573518277" />
     <state x="1039" y="393" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1575499278972">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -193,10 +204,14 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="852" y="337" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1575474348470" />
-    <state x="327" y="116" key="CommitChangelistDialog2" timestamp="1575572930736">
+    <state x="48" y="0" key="#org.jetbrains.kotlin.idea.refactoring.safeDelete.KotlinOverridingDialog" timestamp="1575573710427">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="327" y="116" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1575572930736" />
+    <state x="48" y="0" key="#org.jetbrains.kotlin.idea.refactoring.safeDelete.KotlinOverridingDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1575573710427" />
+    <state x="327" y="116" key="CommitChangelistDialog2" timestamp="1575574490745">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="327" y="116" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1575574490745" />
     <state x="876" y="298" key="DetectedRootsChooserDialog" timestamp="1575474370452">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -205,30 +220,30 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="902" y="337" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1575479365217" />
-    <state width="1354" height="281" key="GridCell.Tab.0.bottom" timestamp="1575572919868">
+    <state width="1354" height="281" key="GridCell.Tab.0.bottom" timestamp="1575573851569">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1354" height="281" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1575572919868" />
-    <state width="1354" height="281" key="GridCell.Tab.0.center" timestamp="1575572919868">
+    <state width="1354" height="281" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1575573851569" />
+    <state width="1354" height="281" key="GridCell.Tab.0.center" timestamp="1575573851569">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1354" height="281" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1575572919868" />
-    <state width="1354" height="281" key="GridCell.Tab.0.left" timestamp="1575572919868">
+    <state width="1354" height="281" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1575573851569" />
+    <state width="1354" height="281" key="GridCell.Tab.0.left" timestamp="1575573851569">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1354" height="281" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1575572919868" />
-    <state width="1354" height="281" key="GridCell.Tab.0.right" timestamp="1575572919868">
+    <state width="1354" height="281" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1575573851569" />
+    <state width="1354" height="281" key="GridCell.Tab.0.right" timestamp="1575573851569">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1354" height="281" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1575572919868" />
+    <state width="1354" height="281" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1575573851569" />
     <state x="602" y="157" key="SettingsEditor" timestamp="1575499262986">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="602" y="157" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1575499262986" />
-    <state x="307" y="256" key="Vcs.Push.Dialog.v2" timestamp="1575557605729">
+    <state x="307" y="256" key="Vcs.Push.Dialog.v2" timestamp="1575572978872">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="307" y="256" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1575557605729" />
+    <state x="307" y="256" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1575572978872" />
     <state x="826" y="476" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1575474292094">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
