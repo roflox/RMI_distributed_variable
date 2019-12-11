@@ -21,10 +21,20 @@
             <artifactId>commons-cli</artifactId>
             <version>1.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.12.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.12.1</version>
+        </dependency>
     </dependencies>
 
     <build>
-        <finalName>node</finalName>
+        <finalName>nodeImpl</finalName>
         <plugins>
             <!-- Set a JDK compiler level -->
             <plugin>
@@ -43,7 +53,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>Node</mainClass>
+                            <mainClass>NodeImpl</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -63,7 +73,7 @@
                     <archive>
                         <manifest>
                             <!-- Jar file entry point -->
-                            <mainClass>Node</mainClass>
+                            <mainClass>NodeImpl</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
