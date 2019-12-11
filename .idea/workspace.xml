@@ -2,18 +2,29 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fb126565-4587-42e0-a95a-607aa9c566a1" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/ConsoleArgumentParser.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/NodeImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/log4j.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ConsoleArgumentParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ConsoleArgumentParser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Node.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/NodeInterface.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/NodeImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/NodeImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -82,7 +93,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Node3">
+  <component name="RunManager" selected="Application.Node5">
     <configuration name="Empty Node" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="NodeImpl" />
       <module name="RMI_distributed_variable" />
@@ -93,7 +104,7 @@
     <configuration name="Node1" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="NodeImpl" />
       <module name="RMI_distributed_variable" />
-      <option name="PROGRAM_PARAMETERS" value="--name Node1 -p 50000 -d -r 1099" />
+      <option name="PROGRAM_PARAMETERS" value="--name Node1 -p 50000 -d -r 1099 --debug " />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -101,7 +112,7 @@
     <configuration name="Node2" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="NodeImpl" />
       <module name="RMI_distributed_variable" />
-      <option name="PROGRAM_PARAMETERS" value="--name Node2 -p 50001 -t Node1 --debug -r 1100" />
+      <option name="PROGRAM_PARAMETERS" value="--name Node2 -p 50001 -t Node1 -r 1100 -P 1099 --debug" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -109,7 +120,7 @@
     <configuration name="Node3" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="NodeImpl" />
       <module name="RMI_distributed_variable" />
-      <option name="PROGRAM_PARAMETERS" value="--name Node3 -p 50002 -t Node2 -r 1101 -P 1100" />
+      <option name="PROGRAM_PARAMETERS" value="--name Node3 -p 50002 -t Node2 -r 1101 -P 1100 --debug " />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -117,7 +128,7 @@
     <configuration name="Node4" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="NodeImpl" />
       <module name="RMI_distributed_variable" />
-      <option name="PROGRAM_PARAMETERS" value="--name Node4 -p 50003 -t Node2" />
+      <option name="PROGRAM_PARAMETERS" value="--name Node4 -p 50003 -t Node2 -r 1102 -P 1100 --debug " />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -125,7 +136,7 @@
     <configuration name="Node5" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="NodeImpl" />
       <module name="RMI_distributed_variable" />
-      <option name="PROGRAM_PARAMETERS" value="--name Node5 -p 50004 -t Node3" />
+      <option name="PROGRAM_PARAMETERS" value="--name Node5 -p 50004 -t Node3 -r 1103 -P 1101 --debug " />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -173,7 +184,7 @@
       <workItem from="1575991830966" duration="14307000" />
       <workItem from="1576011580259" duration="3139000" />
       <workItem from="1576065752925" duration="2062000" />
-      <workItem from="1576068100737" duration="6995000" />
+      <workItem from="1576068100737" duration="10102000" />
     </task>
     <task id="LOCAL-00001" summary="fungujici vytvorene spojeni mezi dvemi nody">
       <created>1575557603286</created>
@@ -203,7 +214,14 @@
       <option name="project" value="LOCAL" />
       <updated>1575574797386</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="oprava implementace, nyní RMI Registry běží na každém nodu">
+      <created>1576081232995</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1576081232995</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -214,7 +232,8 @@
     <MESSAGE value="fungujici vytvorene spojeni mezi dvemi nody" />
     <MESSAGE value="fungující vytvoření kruhu" />
     <MESSAGE value="přidání IDček" />
-    <option name="LAST_COMMIT_MESSAGE" value="přidání IDček" />
+    <MESSAGE value="oprava implementace, nyní RMI Registry běží na každém nodu" />
+    <option name="LAST_COMMIT_MESSAGE" value="oprava implementace, nyní RMI Registry běží na každém nodu" />
   </component>
   <component name="WindowStateProjectService">
     <state x="677" y="178" key="#Node" timestamp="1575499247090">
@@ -225,10 +244,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1032" y="181" key="#Project_Structure/0.0.1920.1040@0.0.1920.1040" timestamp="1576013413810" />
-    <state x="237" y="34" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1576080645488">
+    <state x="470" y="61" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1576090633597">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="237" y="34" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1576080645488" />
+    <state x="470" y="61" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1576090633597" />
     <state x="765" y="235" key="#com.intellij.ide.util.MemberChooser" timestamp="1576068326895">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -249,10 +268,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="48" y="0" key="#org.jetbrains.kotlin.idea.refactoring.safeDelete.KotlinOverridingDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1575573710427" />
-    <state x="327" y="116" key="CommitChangelistDialog2" timestamp="1576081209488">
+    <state x="327" y="116" key="CommitChangelistDialog2" timestamp="1576081232040">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="327" y="116" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1576081209488" />
+    <state x="327" y="116" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1576081232040" />
     <state x="876" y="298" key="DetectedRootsChooserDialog" timestamp="1575474370452">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -261,22 +280,22 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="902" y="337" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1575576620913" />
-    <state width="1877" height="277" key="GridCell.Tab.0.bottom" timestamp="1576081180513">
+    <state width="1877" height="277" key="GridCell.Tab.0.bottom" timestamp="1576090675067">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="277" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1576081180513" />
-    <state width="1877" height="277" key="GridCell.Tab.0.center" timestamp="1576081180513">
+    <state width="1877" height="277" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1576090675067" />
+    <state width="1877" height="277" key="GridCell.Tab.0.center" timestamp="1576090675067">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="277" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1576081180513" />
-    <state width="1877" height="277" key="GridCell.Tab.0.left" timestamp="1576081180513">
+    <state width="1877" height="277" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1576090675067" />
+    <state width="1877" height="277" key="GridCell.Tab.0.left" timestamp="1576090675066">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="277" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1576081180513" />
-    <state width="1877" height="277" key="GridCell.Tab.0.right" timestamp="1576081180513">
+    <state width="1877" height="277" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1576090675066" />
+    <state width="1877" height="277" key="GridCell.Tab.0.right" timestamp="1576090675067">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="277" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1576081180513" />
+    <state width="1877" height="277" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1576090675067" />
     <state width="1877" height="280" key="GridCell.Tab.1.bottom" timestamp="1576067770703">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

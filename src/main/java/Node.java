@@ -68,7 +68,5 @@ public interface Node extends Remote {
 
     void repairRing() throws RemoteException;
 
-    Registry getRegistry() throws RemoteException;
-
 
 }

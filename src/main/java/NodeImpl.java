@@ -5,6 +5,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 
@@ -17,6 +18,7 @@ public class NodeImpl implements Node {
     Set<Node> allNodes = new HashSet<>();
     String name;
     int id;
+    int variable;
 
     public NodeImpl(String name, Registry registry, int objectPort) {
         this.name = name;
@@ -121,6 +123,7 @@ public class NodeImpl implements Node {
             allNodes.add(this);
         }
         id = 1;
+        variable = new Random().nextInt();
     }
 
     @Override
@@ -229,10 +232,5 @@ public class NodeImpl implements Node {
     @Override
     public void repairRing() throws RemoteException {
 
-    }
-
-    @Override
-    public Registry getRegistry() throws RemoteException {
-        return null;
     }
 }
