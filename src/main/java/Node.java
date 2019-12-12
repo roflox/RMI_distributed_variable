@@ -15,15 +15,15 @@ public interface Node extends Remote {
      * @param next nový node, který bude označený jako next
      * @throws RemoteException -
      */
-    void changeNext(Node next) throws RemoteException;
+    void setRight(Node next) throws RemoteException;
 
     /**
      * @param prev nový node který bude označen jako Previous
      * @throws RemoteException -
      */
-    void changePrev(Node prev) throws RemoteException;
+    void setLeft(Node prev) throws RemoteException;
 
-    Node getPrev() throws RemoteException;
+    Node getLeft() throws RemoteException;
 
     Node getNext() throws RemoteException;
 
@@ -62,11 +62,15 @@ public interface Node extends Remote {
 
     void elect() throws RemoteException;
 
-    void lookLeft() throws RemoteException;
+    void lookLeft(Integer id) throws RemoteException;
 
-    void lookRight() throws RemoteException;
+//    void lookRight(Integer id) throws RemoteException;
+
+    Node lookRight() throws RemoteException;
 
     void repairRing() throws RemoteException;
 
+    void disconnect() throws RemoteException;
 
+    void ping() throws RemoteException;
 }

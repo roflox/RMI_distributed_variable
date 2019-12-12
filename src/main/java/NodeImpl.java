@@ -12,9 +12,9 @@ import java.util.Set;
 public class NodeImpl implements Node {
 
     private static boolean debug = false;
-    Node nextNode;
-    Node prevNode;
-    Node leaderNode;
+    Node right;
+    Node left;
+    Node leader;
     Set<Node> allNodes = new HashSet<>();
     String name;
     int id;
@@ -93,9 +93,7 @@ public class NodeImpl implements Node {
     private void connectToAnotherNode(String target, String targetRegistryAddress, int targetRegistryPort) {
         try {
             Registry registry = LocateRegistry.getRegistry(targetRegistryAddress, targetRegistryPort);
-//            System.out.println(targetRegistryAddress + ":" + targetRegistryPort);
             Node node = (Node) registry.lookup(target);
-//            System.out.println(node.getName());
             node.join(this.name, this);
         } catch (RemoteException | NotBoundException e) {
             e.printStackTrace();
@@ -114,10 +112,10 @@ public class NodeImpl implements Node {
     }
 
     private void becomeLeader() {
-        leaderNode = this;
-        if (prevNode == null) {
-            prevNode = this;
-            nextNode = this;
+        leader = this;
+        if (left == null) {
+            left = this;
+            right = this;
         }
         if (allNodes.isEmpty()) {
             allNodes.add(this);
@@ -127,49 +125,49 @@ public class NodeImpl implements Node {
     }
 
     @Override
-    public void join(String name, Node node) throws RemoteException {
+    public synchronized void join(String name, Node node) throws RemoteException {
         System.out.println(String.format("%s is connecting.", name));
-        node.setLeader(this.leaderNode);
-        node.changeNext(this.nextNode);
-        this.nextNode.changePrev(node);
-        node.changePrev(this);
-        this.nextNode = node;
+        node.setLeader(this.leader);
+        node.setRight(this.right);
+        this.right.setLeft(node);
+        node.setLeft(this);
+        this.right = node;
+        this.leader.joinSet(node);
         if (debug) {
             node.printInfo();
             node.getNext().printInfo();
-            if (!node.getNext().equals(node.getPrev())) node.getPrev().printInfo();
+            if (!node.getNext().equals(node.getLeft())) node.getLeft().printInfo();
         }
-        this.leaderNode.joinSet(node);
     }
 
     @Override
-    public void changeNext(Node next) throws RemoteException {
-        this.nextNode = next;
+    public Node getLeft() throws RemoteException {
+        return this.left;
     }
 
     @Override
-    public void changePrev(Node prev) throws RemoteException {
-        this.prevNode = prev;
-    }
-
-    @Override
-    public Node getPrev() throws RemoteException {
-        return this.prevNode;
+    public synchronized void setLeft(Node left) throws RemoteException {
+        this.left = left;
     }
 
     @Override
     public Node getNext() throws RemoteException {
-        return this.nextNode;
+        return this.right;
+    }
+
+    @Override
+    public synchronized void setRight(Node right) throws RemoteException {
+        this.right = right;
     }
 
     @Override
     public Node getLeader() throws RemoteException {
-        return this.leaderNode;
+        return this.leader;
     }
 
     @Override
-    public void setLeader(Node leader) throws RemoteException {
-        this.leaderNode = leader;
+    public synchronized void setLeader(Node leader) throws RemoteException {
+        this.leader = leader;
     }
 
     @Override
@@ -180,14 +178,14 @@ public class NodeImpl implements Node {
     @Override
     public void printInfo() throws RemoteException {
         StringBuilder sb = new StringBuilder("\n");
-        if (this.nextNode != null) {
-            sb.append("Next: ").append(this.nextNode.getName()).append(" id: ").append(this.nextNode.getId()).append(", ");
+        if (this.right != null) {
+            sb.append("Next: ").append(this.right.getName()).append(" id: ").append(this.right.getId()).append(", ");
         }
-        if (this.prevNode != null) {
-            sb.append("Prev: ").append(this.prevNode.getName()).append(" id: ").append(this.prevNode.getId()).append(", ");
+        if (this.left != null) {
+            sb.append("Prev: ").append(this.left.getName()).append(" id: ").append(this.left.getId()).append(", ");
         }
-        if (this.leaderNode != null) {
-            sb.append("Leader: ").append(this.leaderNode.getName()).append(" id: ").append(this.leaderNode.getId());
+        if (this.leader != null) {
+            sb.append("Leader: ").append(this.leader.getName()).append(" id: ").append(this.leader.getId());
         }
         System.out.println(sb.toString());
 //        LOG.debug(sb.toString());
@@ -220,17 +218,65 @@ public class NodeImpl implements Node {
     }
 
     @Override
-    public void lookLeft() throws RemoteException {
-
+    public void lookLeft(Integer id) throws RemoteException {
+        if(id==null){
+            id = this.id;
+        }
+        try{
+            left.lookLeft(id);
+        }catch (RemoteException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void lookRight() throws RemoteException {
-
+    public Node lookRight() throws RemoteException {
+        try{
+            this.right.ping();
+        }catch (RemoteException e){
+            System.err.println(this.name+"'s right node is dead.");
+            return this;
+        }
+        Node node = this.right.lookRight();
+        if(node!=null){
+            synchronized (this){
+                this.left = node;
+                synchronized (node){
+                    node.setLeft(this);
+                }
+            }
+        }
+        return null;
     }
+
 
     @Override
     public void repairRing() throws RemoteException {
+
+    }
+
+    @Override
+    public void disconnect() throws RemoteException {
+        synchronized (this) {
+            if (!this.left.equals(this)) {
+                this.left.setRight(this.right);
+                this.right.setLeft(this.left);
+            }
+        }
+        //TODO odevzdat práci počkat na ukončení atd.
+        System.out.println(String.format("%s is disconnecting.", name));
+        Registry registry = LocateRegistry.getRegistry(1099);
+        try {
+            registry.unbind(this.name);
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        }
+//        System.exit(0);
+//        System.exit(1);
+    }
+
+    @Override
+    public void ping() throws RemoteException {
 
     }
 }
