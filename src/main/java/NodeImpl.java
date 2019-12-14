@@ -12,6 +12,7 @@ import java.util.Set;
 public class NodeImpl implements Node {
 
     private static boolean debug = false;
+    //    private static final Logger LOG = LogManager.getLogger(NodeImpl.class);
     Node right;
     Node left;
     Node leader;
@@ -179,13 +180,27 @@ public class NodeImpl implements Node {
     public void printInfo() throws RemoteException {
         StringBuilder sb = new StringBuilder("\n");
         if (this.right != null) {
-            sb.append("Next: ").append(this.right.getName()).append(" id: ").append(this.right.getId()).append(", ");
+            try {
+                sb.append("Right: ").append(this.right.getName()).append(" id: ").append(this.right.getId()).append(", ");
+            } catch (RemoteException e) {
+                sb.append("Right node is dead");
+//                sb.append("New Right node is:").append(this.right.getName()).append(", ");
+            }
         }
         if (this.left != null) {
-            sb.append("Prev: ").append(this.left.getName()).append(" id: ").append(this.left.getId()).append(", ");
+            try {
+                sb.append("Left: ").append(this.left.getName()).append(" id: ").append(this.left.getId()).append(", ");
+            } catch (RemoteException e) {
+                sb.append("Left node is dead, ");
+//                sb.append("New Left node is:").append(this.left.getName()).append(", ");
+            }
         }
         if (this.leader != null) {
-            sb.append("Leader: ").append(this.leader.getName()).append(" id: ").append(this.leader.getId());
+            try {
+                sb.append("Leader: ").append(this.leader.getName()).append(" id: ").append(this.leader.getId());
+            } catch (RemoteException e) {
+                sb.append("Leader node is dead");
+            }
         }
         System.out.println(sb.toString());
 //        LOG.debug(sb.toString());
@@ -218,41 +233,62 @@ public class NodeImpl implements Node {
     }
 
     @Override
-    public void lookLeft(Integer id) throws RemoteException {
-        if(id==null){
-            id = this.id;
-        }
-        try{
-            left.lookLeft(id);
-        }catch (RemoteException e){
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public Node lookRight() throws RemoteException {
-        try{
-            this.right.ping();
-        }catch (RemoteException e){
-            System.err.println(this.name+"'s right node is dead.");
-            return this;
-        }
-        Node node = this.right.lookRight();
-        if(node!=null){
-            synchronized (this){
-                this.left = node;
-                synchronized (node){
-                    node.setLeft(this);
-                }
+    public Node look(String starter, Path where) throws RemoteException {
+        System.out.println("starter:" + starter);
+        if (starter != null) {
+            if (starter.equals(this.name)) {
+                System.out.println("ring is healthy");
+                return this;
             }
+        }
+        if (starter == null) {
+            starter = this.name;
+        }
+        switch (where) {
+            case left:
+                try {
+                    return left.look(starter, Path.left);
+                } catch (RemoteException e) {
+                    return this;
+                }
+            case right:
+                try {
+                    return right.look(starter, Path.right);
+                } catch (RemoteException e) {
+                    return this;
+                }
         }
         return null;
     }
 
 
+    public boolean isHealthy() throws RemoteException {
+        try {
+            this.right.ping();
+            this.left.ping();
+        } catch (RemoteException e) {
+            return false;
+        }
+        return true;
+    }
+
+
     @Override
     public void repairRing() throws RemoteException {
+        Node lookRight = this.look(null, Path.right);
+        Node lookLeft = this.look(null, Path.left);
+        System.out.println("lookLeft:" + lookLeft.getName());
+        System.out.println("lookRight:" + lookRight.getName());
+        if (!lookLeft.equals(lookRight) || !isHealthy()) {
+            lookLeft.setLeft(lookRight);
+            System.out.println("changed " + lookLeft.getName() + "'s left to " + lookRight.getName());
+            lookRight.setRight(lookLeft);
+            System.out.println("changed " + lookRight.getName() + "'s right to " + lookLeft.getName());
 
+        }
+        System.out.println("ring repaired");
+        lookLeft.printInfo();
+        lookRight.printInfo();
     }
 
     @Override

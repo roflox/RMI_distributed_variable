@@ -62,11 +62,10 @@ public interface Node extends Remote {
 
     void elect() throws RemoteException;
 
-    void lookLeft(Integer id) throws RemoteException;
+    Node look(String starter, Path where) throws RemoteException;
 
-//    void lookRight(Integer id) throws RemoteException;
 
-    Node lookRight() throws RemoteException;
+    boolean isHealthy() throws RemoteException;
 
     void repairRing() throws RemoteException;
 
