@@ -1,6 +1,7 @@
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
+import java.util.Set;
 
 public interface Node extends Remote {
 
@@ -60,7 +61,7 @@ public interface Node extends Remote {
 
     void election() throws RemoteException;
 
-    void elect() throws RemoteException;
+    Set<Integer> elect(int starter) throws RemoteException;
 
     Node look(String starter, Path where) throws RemoteException;
 
@@ -72,4 +73,8 @@ public interface Node extends Remote {
     void disconnect() throws RemoteException;
 
     void ping() throws RemoteException;
+
+    void newLeader(int id) throws RemoteException;
+
+    Set<Node> getNodes() throws RemoteException;
 }

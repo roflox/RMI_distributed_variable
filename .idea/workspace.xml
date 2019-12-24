@@ -2,10 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fb126565-4587-42e0-a95a-607aa9c566a1" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/Path.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ConsoleArgumentParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ConsoleArgumentParser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Node.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/NodeImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/NodeImpl.java" afterDir="false" />
     </list>
@@ -75,14 +77,14 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../chat2" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../adam" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
+    <property name="settings.editor.selected.configurable" value="web.server" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -96,7 +98,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Client">
+  <component name="RunManager" selected="Application.Node5">
     <configuration name="Client" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Client" />
       <module name="RMI_distributed_variable" />
@@ -114,7 +116,7 @@
     <configuration name="Node1" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="NodeImpl" />
       <module name="RMI_distributed_variable" />
-      <option name="PROGRAM_PARAMETERS" value="--name Node1 -p 50000 -d -r 1099 --debug " />
+      <option name="PROGRAM_PARAMETERS" value="--name Node1 -p 50000 -d -r 1099 --debug --fun" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -162,8 +164,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Client" />
         <item itemvalue="Application.Node1" />
+        <item itemvalue="Application.Client" />
       </list>
     </recent_temporary>
   </component>
@@ -202,6 +204,10 @@
       <workItem from="1576175875392" duration="2012000" />
       <workItem from="1576228804121" duration="886000" />
       <workItem from="1576343732113" duration="5760000" />
+      <workItem from="1576610234292" duration="5398000" />
+      <workItem from="1577025226883" duration="2612000" />
+      <workItem from="1577028855138" duration="2011000" />
+      <workItem from="1577120359483" duration="4535000" />
     </task>
     <task id="LOCAL-00001" summary="fungujici vytvorene spojeni mezi dvemi nody">
       <created>1575557603286</created>
@@ -276,22 +282,26 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="552" y="178" key="#Notifications/0.0.1920.1040@0.0.1920.1040" timestamp="1576181942743" />
-    <state x="1032" y="181" key="#Project_Structure" timestamp="1576013413810">
+    <state x="1032" y="181" key="#Project_Structure" timestamp="1577121897880">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1032" y="181" key="#Project_Structure/0.0.1920.1040@0.0.1920.1040" timestamp="1576013413810" />
-    <state x="470" y="61" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1576171841019">
+    <state x="1032" y="181" key="#Project_Structure/0.0.1920.1040@0.0.1920.1040" timestamp="1577121897879" />
+    <state x="470" y="61" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1577026990615">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="470" y="61" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1576171841019" />
-    <state x="765" y="235" key="#com.intellij.ide.util.MemberChooser" timestamp="1576343994102">
+    <state x="470" y="61" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1577026990615" />
+    <state x="765" y="235" key="#com.intellij.ide.util.MemberChooser" timestamp="1577189506611">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="765" y="235" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1576343994102" />
+    <state x="765" y="235" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1577189506611" />
     <state x="1039" y="393" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1576006750193">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1039" y="393" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1576006750193" />
+    <state x="640" y="247" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1576612686262">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="640" y="247" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1576612686262" />
     <state x="308" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1576006702752">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -304,34 +314,34 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="48" y="0" key="#org.jetbrains.kotlin.idea.refactoring.safeDelete.KotlinOverridingDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1575573710427" />
-    <state x="327" y="116" key="CommitChangelistDialog2" timestamp="1576181963285">
+    <state x="327" y="116" key="CommitChangelistDialog2" timestamp="1576349655314">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="327" y="116" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1576181963285" />
+    <state x="327" y="116" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1576349655314" />
     <state x="876" y="298" key="DetectedRootsChooserDialog" timestamp="1575474370452">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="876" y="298" key="DetectedRootsChooserDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1575474370452" />
-    <state x="902" y="337" key="FileChooserDialogImpl" timestamp="1575576620913">
+    <state x="902" y="337" key="FileChooserDialogImpl" timestamp="1576613607448">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="902" y="337" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1575576620913" />
-    <state width="938" height="260" key="GridCell.Tab.0.bottom" timestamp="1576349621811">
+    <state x="902" y="337" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1576613607448" />
+    <state width="1877" height="280" key="GridCell.Tab.0.bottom" timestamp="1577190323106">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="938" height="260" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1576349621811" />
-    <state width="938" height="260" key="GridCell.Tab.0.center" timestamp="1576349621811">
+    <state width="1877" height="280" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1577190323106" />
+    <state width="1877" height="280" key="GridCell.Tab.0.center" timestamp="1577190323106">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="938" height="260" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1576349621811" />
-    <state width="938" height="260" key="GridCell.Tab.0.left" timestamp="1576349621811">
+    <state width="1877" height="280" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1577190323106" />
+    <state width="1877" height="280" key="GridCell.Tab.0.left" timestamp="1577190323106">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="938" height="260" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1576349621811" />
-    <state width="938" height="260" key="GridCell.Tab.0.right" timestamp="1576349621811">
+    <state width="1877" height="280" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1577190323106" />
+    <state width="1877" height="280" key="GridCell.Tab.0.right" timestamp="1577190323106">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="938" height="260" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1576349621811" />
+    <state width="1877" height="280" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1577190323106" />
     <state width="1877" height="280" key="GridCell.Tab.1.bottom" timestamp="1576067770703">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -352,18 +362,26 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="490" y="174" key="Maven.ArtifactSearchDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1575996797151" />
-    <state x="602" y="157" key="SettingsEditor" timestamp="1575499262986">
+    <state x="625" y="218" key="NewModule_or_Project.wizard" timestamp="1576613584216">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="602" y="157" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1575499262986" />
-    <state x="307" y="256" key="Vcs.Push.Dialog.v2" timestamp="1576181966280">
+    <state x="625" y="218" key="NewModule_or_Project.wizard/0.0.1920.1040@0.0.1920.1040" timestamp="1576613584216" />
+    <state x="602" y="157" key="SettingsEditor" timestamp="1577030770333">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="307" y="256" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1576181966280" />
+    <state x="602" y="157" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1577030770333" />
+    <state x="307" y="256" key="Vcs.Push.Dialog.v2" timestamp="1576349657930">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="307" y="256" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1576349657930" />
     <state x="826" y="476" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1575474292094">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="826" y="476" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/0.0.1920.1040@0.0.1920.1040" timestamp="1575474292094" />
+    <state x="986" y="245" key="ftp.server.browser" timestamp="1577030739489">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="986" y="245" key="ftp.server.browser/0.0.1920.1040@0.0.1920.1040" timestamp="1577030739489" />
     <state x="371" y="244" key="run.anything.popup" timestamp="1576229052541">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>

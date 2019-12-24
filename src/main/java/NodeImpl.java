@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -9,7 +12,7 @@ import java.util.Random;
 import java.util.Set;
 
 
-public class NodeImpl implements Node {
+public class NodeImpl implements Node, Runnable {
 
     private static boolean debug = false;
     //    private static final Logger LOG = LogManager.getLogger(NodeImpl.class);
@@ -18,8 +21,9 @@ public class NodeImpl implements Node {
     Node leader;
     Set<Node> allNodes = new HashSet<>();
     String name;
-    int id;
+    int id = 0;
     int variable;
+    boolean working = false;
 
     public NodeImpl(String name, Registry registry, int objectPort) {
         this.name = name;
@@ -37,6 +41,7 @@ public class NodeImpl implements Node {
      *             -d --debug spuštění debug módu
      */
     public static void main(String[] args) {
+
         Map<String, Object> arguments = ConsoleArgumentParser.parse(args);
         // getting arguments from map
         String targetRegistryAddress = (String) arguments.get("targetRegistryAddress");
@@ -47,8 +52,12 @@ public class NodeImpl implements Node {
         String nodeName = (String) arguments.get("nodeName");
         debug = (boolean) arguments.get("debug");
         boolean development = (boolean) arguments.get("development");
+//        boolean fun = (boolean) arguments.get("fun");
 
         // Logger
+
+//        if (fun && !debug)
+//            printLogo();
 
 //        LOG.setLevel(Level.INFO);
 //        LOG.log(Level.ALL,String.format("Using RMI Registry host: %s:%s", registryHost, registryPort));
@@ -70,12 +79,14 @@ public class NodeImpl implements Node {
         }
         NodeImpl nodeImpl = new NodeImpl(nodeName, registry, port);
         System.out.println(String.format("Node is using name: %s, port: %d,registry port: :%d", nodeName, port, registryPort));
+
         if (target == null) {
             nodeImpl.becomeLeader();
         } else {
             System.out.println(String.format("Trying to connect to %s with registry on %s:%d", target, targetRegistryAddress, targetRegistryPort));
             nodeImpl.connectToAnotherNode(target, targetRegistryAddress, targetRegistryPort);
         }
+        nodeImpl.run();
     }
 
     private void bindNode(int objectPort, Registry registry) {
@@ -121,8 +132,16 @@ public class NodeImpl implements Node {
         if (allNodes.isEmpty()) {
             allNodes.add(this);
         }
-        id = 1;
-        variable = new Random().nextInt();
+        if (this.id == 0) {
+            id = 1;
+            variable = new Random().nextInt();
+        }else {
+            try {
+                this.allNodes.addAll(right.getNodes());
+            }catch (RemoteException e){
+                System.err.println((e.getMessage()));
+            }
+        }
     }
 
     @Override
@@ -198,9 +217,20 @@ public class NodeImpl implements Node {
         if (this.leader != null) {
             try {
                 sb.append("Leader: ").append(this.leader.getName()).append(" id: ").append(this.leader.getId());
+                if(this.leader.getId()==this.id){
+                    sb.append("\n This node is leader, all nodes: ");
+                    for (Node n: allNodes) {
+                        try{
+                            sb.append(n.getName()).append(", id:").append(n.getId()).append("; ");
+                        }catch (RemoteException e){
+                            sb.append("Some nodes are dead.");
+                        }
+                    }
+                }
             } catch (RemoteException e) {
                 sb.append("Leader node is dead");
             }
+
         }
         System.out.println(sb.toString());
 //        LOG.debug(sb.toString());
@@ -224,12 +254,20 @@ public class NodeImpl implements Node {
 
     @Override
     public void election() throws RemoteException {
-
+        Set<Integer> voters = this.right.elect(this.id);
+        int newLeaderId = voters.stream().min(Integer::compareTo).get();
+        newLeader(newLeaderId);
     }
 
     @Override
-    public void elect() throws RemoteException {
-
+    public Set<Integer> elect(int starter) throws RemoteException {
+        Set<Integer> ids = new HashSet<>();
+        ids.add(this.id);
+        if (this.id == starter) {
+            return ids;
+        }
+        ids.addAll(right.elect(starter));
+        return ids;
     }
 
     @Override
@@ -261,7 +299,6 @@ public class NodeImpl implements Node {
         return null;
     }
 
-
     public boolean isHealthy() throws RemoteException {
         try {
             this.right.ping();
@@ -271,7 +308,6 @@ public class NodeImpl implements Node {
         }
         return true;
     }
-
 
     @Override
     public void repairRing() throws RemoteException {
@@ -294,25 +330,91 @@ public class NodeImpl implements Node {
     @Override
     public void disconnect() throws RemoteException {
         synchronized (this) {
-            if (!this.left.equals(this)) {
+            if (this.left.getId() != this.id) {
                 this.left.setRight(this.right);
                 this.right.setLeft(this.left);
+                this.left.printInfo();
+                if (this.left.getId() != this.right.getId())
+                    this.right.printInfo();
             }
+        }
+
+        if (this.leader.getId() == this.id && this.left.getId() != this.id) {
+            this.left.election();
         }
         //TODO odevzdat práci počkat na ukončení atd.
         System.out.println(String.format("%s is disconnecting.", name));
-        Registry registry = LocateRegistry.getRegistry(1099);
-        try {
-            registry.unbind(this.name);
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        }
+//        Registry registry = LocateRegistry.getRegistry(1099);
+//        try {
+//            registry.unbind(this.name);
+//        } catch (NotBoundException e) {
+//            e.printStackTrace();
+//        }
 //        System.exit(0);
-//        System.exit(1);
+        System.exit(1);
     }
 
     @Override
     public void ping() throws RemoteException {
 
+    }
+
+    @Override
+    public void newLeader(int id) throws RemoteException {
+        if (this.id == id) {
+            this.becomeLeader();
+        } else {
+            right.newLeader(id);
+        }
+    }
+
+    @Override
+    public Set<Node> getNodes() throws RemoteException {
+        Set<Node> nodes = new HashSet<>();
+        if(this.id == leader.getId()){
+            return nodes;
+        }else {
+            nodes.add(this);
+            nodes.addAll(right.getNodes());
+            return nodes;
+        }
+    }
+
+    private void printHelp() {
+        System.out.println("Available commands are:");
+        System.out.println("\t\t\t\\i - to print info");
+        System.out.println("\t\t\t\\q - to gently shutdown node");
+        System.out.println("\t\t\t\\h - for this message");
+    }
+
+    @Override
+    public void run() {
+        System.out.println("To see all commands, just write \\h and hit enter.");
+        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        String input;
+        while (true) {
+            try {
+                input = bf.readLine();
+                switch (input) {
+                    case "\\q":
+                        disconnect();
+                        break;
+                    case "\\i":
+                        printInfo();
+                        break;
+                    case "\\e":
+                        election();
+                        break;
+                    case "\\h":
+                        printHelp();
+                        break;
+                    default:
+                        printHelp();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 }
