@@ -1,10 +1,12 @@
+package nodes;
+
 import org.apache.commons.cli.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * tato třída je zde pouze abych neměl "bordel" v NodeImpl :)
+ * tato třída je zde pouze abych neměl "bordel" v nodes.NodeImpl :)
  */
 public class ConsoleArgumentParser {
 

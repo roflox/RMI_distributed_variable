@@ -1,13 +1,16 @@
+package nodes;
+
+import tasks.Task;
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
 import java.util.Set;
 
 public interface Node extends Remote {
 
     /**
-     * @param name jméno objektu uloženého v RMI registrech
-     * @param nodeImpl samotný Node, který se připojuje do systému
+     * @param name     jméno objektu uloženého v RMI registrech
+     * @param nodeImpl samotný nodes.Node, který se připojuje do systému
      * @throws RemoteException -
      */
     void join(String name, Node nodeImpl) throws RemoteException;
@@ -37,7 +40,7 @@ public interface Node extends Remote {
     String getName() throws RemoteException;
 
     /**
-     * určeno k vypsání všech nodů na které má Node nějaký ukazatel
+     * určeno k vypsání všech nodů na které má nodes.Node nějaký ukazatel
      *
      * @throws RemoteException -
      */
@@ -77,4 +80,14 @@ public interface Node extends Remote {
     void newLeader(int id) throws RemoteException;
 
     Set<Node> getNodes() throws RemoteException;
+
+    void executeTask(Task task) throws RemoteException;
+
+    int getVariable() throws RemoteException;
+
+    void changeVariable(int value) throws RemoteException;
+
+    boolean isAvailable() throws RemoteException;
+
+    boolean isExecutable() throws RemoteException;
 }

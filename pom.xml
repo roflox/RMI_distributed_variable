@@ -53,7 +53,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>NodeImpl</mainClass>
+                            <mainClass>nodes.NodeImpl</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -73,7 +73,7 @@
                     <archive>
                         <manifest>
                             <!-- Jar file entry point -->
-                            <mainClass>NodeImpl</mainClass>
+                            <mainClass>nodes.NodeImpl</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
