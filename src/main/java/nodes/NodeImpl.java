@@ -1,5 +1,6 @@
 package nodes;
 
+import javafx.util.Pair;
 import tasks.Increase;
 import tasks.Task;
 
@@ -21,7 +22,7 @@ public class NodeImpl implements Node, Runnable {
     Node right;
     Node left;
     Node leader;
-    Set<Node> allNodes = new HashSet<>();
+    Map<Integer, Node> allNodes = new HashMap<Integer, Node>();
     String name;
     int id = 0;
     public int variable;
@@ -133,14 +134,14 @@ public class NodeImpl implements Node, Runnable {
             right = this;
         }
         if (allNodes.isEmpty()) {
-            allNodes.add(this);
-        }
-        if (this.id == 0) {
-            id = 1;
-            variable = new Random().nextInt();
+            if (this.id == 0) {
+                id = 1;
+                variable = new Random().nextInt();
+                this.allNodes.put(id, this);
+            }
         } else {
             try {
-                this.allNodes.addAll(right.getNodes());
+                this.allNodes.putAll(right.getNodes());
             } catch (RemoteException e) {
                 System.err.println((e.getMessage()));
             }
@@ -157,7 +158,7 @@ public class NodeImpl implements Node, Runnable {
         node.setLeft(this);
         this.right = node;
         this.leader.joinSet(node);
-        node.changeVariable(this.variable);
+        node.changeVariable(this.variable, this.id);
         if (debug) {
             node.printInfo();
             node.getNext().printInfo();
@@ -224,7 +225,7 @@ public class NodeImpl implements Node, Runnable {
                 sb.append("Leader: ").append(this.leader.getName()).append(" id: ").append(this.leader.getId());
                 if (this.leader.getId() == this.id) {
                     sb.append("\n This node is leader, all nodes: ");
-                    for (Node n : allNodes) {
+                    for (Node n : allNodes.values()) {
                         try {
                             sb.append(n.getName()).append(", id:").append(n.getId()).append("; ");
                         } catch (RemoteException e) {
@@ -243,9 +244,9 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public void joinSet(Node node) throws RemoteException {
-        this.allNodes.add(node);
-        node.setId(allNodes.size());
+    public synchronized void joinSet(Node node) throws RemoteException {
+        node.setId(allNodes.size() + 1);
+        this.allNodes.put(node.getId(), node);
     }
 
     @Override
@@ -350,13 +351,6 @@ public class NodeImpl implements Node, Runnable {
         }
         //TODO odevzdat práci počkat na ukončení atd.
         System.out.println(String.format("%s is disconnecting.", name));
-//        Registry registry = LocateRegistry.getRegistry(1099);
-//        try {
-//            registry.unbind(this.name);
-//        } catch (NotBoundException e) {
-//            e.printStackTrace();
-//        }
-//        System.exit(0);
         System.exit(1);
     }
 
@@ -375,21 +369,22 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public Set<Node> getNodes() throws RemoteException {
-        Set<Node> nodes = new HashSet<>();
+    public Map<Integer, Node> getNodes() throws RemoteException {
+        HashMap<Integer, Node> nodes = new HashMap<>();
         if (this.id != leader.getId()) {
-            nodes.add(this);
-            nodes.addAll(right.getNodes());
+            nodes.put(this.id, this);
+            nodes.putAll(right.getNodes());
         }
         return nodes;
     }
 
     @Override
     public synchronized void executeTask(Task task) throws RemoteException {
-        if( this.leader.isExecutable()) {
+        if (this.leader.isExecutable()) {
             working = true;
             task.execute(this);
-            this.leader.changeVariable(this.variable);
+            leader.ping();
+            this.leader.changeVariable(this.variable, this.id);
         }
         working = false;
     }
@@ -406,8 +401,8 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public boolean isExecutable() throws RemoteException {
-        for (Node n: allNodes) {
-            if(!n.isAvailable()) {
+        for (Node n : allNodes.values()) {
+            if (!n.isAvailable()) {
                 if (debug)
                     System.out.println("not executable, node :" + n.getName() + " is working");
                 return false;
@@ -417,12 +412,21 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public synchronized void changeVariable(int value) throws RemoteException {
-        if (isLeader) for (Node node : allNodes) {
-            if (node.isAvailable())
-                node.changeVariable(value);
+    public synchronized void changeVariable(int value, int starterId) throws RemoteException {
+        if(starterId!=this.id&&debug)
+            System.out.println(String.format("Node: %s is changing variable %d to %d",starterId,this.variable,value));
+        if (isLeader) {
+            for (Map.Entry<Integer, Node> i : allNodes.entrySet()) {
+//                System.out.println("changing on node: " + i.getKey());
+                if (i.getKey() != starterId && !i.getValue().isLeader()) {
+                    i.getValue().changeVariable(value, starterId);
+                } else if (i.getValue().isLeader()) {
+                    this.variable = value;
+                }
+            }
+        } else {
+            this.variable = value;
         }
-        this.variable = value;
     }
 
     private void printHelp() {
@@ -440,7 +444,6 @@ public class NodeImpl implements Node, Runnable {
         while (true) {
             try {
                 input = bf.readLine();
-                System.out.println(input=="\\a");
                 switch (input) {
                     case "\\q":
                         disconnect();
@@ -455,7 +458,6 @@ public class NodeImpl implements Node, Runnable {
                         printHelp();
                         break;
                     case "\\a":
-                        System.out.println("executing addition");
                         executeTask(new Increase(1));
                         printInfo();
                         break;
@@ -464,6 +466,7 @@ public class NodeImpl implements Node, Runnable {
                 }
             } catch (RemoteException e) {
                 System.err.println("Topology is damaged.");
+                e.printStackTrace();
                 try {
                     this.repairRing();
                 } catch (RemoteException fe) {
@@ -476,6 +479,11 @@ public class NodeImpl implements Node, Runnable {
             }
 
         }
+    }
+
+    @Override
+    public boolean isLeader() throws RemoteException {
+        return isLeader;
     }
 
 }

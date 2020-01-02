@@ -4,6 +4,7 @@ import tasks.Task;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Map;
 import java.util.Set;
 
 public interface Node extends Remote {
@@ -79,15 +80,17 @@ public interface Node extends Remote {
 
     void newLeader(int id) throws RemoteException;
 
-    Set<Node> getNodes() throws RemoteException;
+    Map<Integer,Node> getNodes() throws RemoteException;
 
     void executeTask(Task task) throws RemoteException;
 
     int getVariable() throws RemoteException;
 
-    void changeVariable(int value) throws RemoteException;
+    void changeVariable(int value, int starterId) throws RemoteException;
 
     boolean isAvailable() throws RemoteException;
 
     boolean isExecutable() throws RemoteException;
+
+    boolean isLeader() throws RemoteException;
 }

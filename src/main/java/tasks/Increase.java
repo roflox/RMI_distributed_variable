@@ -9,8 +9,6 @@ public class Increase extends Task {
 
     @Override
     public void execute(NodeImpl node) {
-        System.out.println("new value will be,"+node.variable+integer);
         node.variable += integer;
-        System.out.println(node.variable);
     }
 }
