@@ -58,6 +58,10 @@ public class NodeImpl implements Node, Runnable {
         String nodeName = (String) arguments.get("nodeName");
         debug = (boolean) arguments.get("debug");
         boolean development = (boolean) arguments.get("development");
+        String hostname = (String) arguments.get("hostname");
+
+        // Toto tu je, aby se dalo vzdáleně připojovat na nody.
+        System.setProperty("java.rmi.server.hostname",hostname);
 //        boolean fun = (boolean) arguments.get("fun");
 
         // Logger
