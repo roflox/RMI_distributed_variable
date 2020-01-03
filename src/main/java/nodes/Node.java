@@ -72,7 +72,7 @@ public interface Node extends Remote {
 
     boolean isHealthy() throws RemoteException;
 
-    void repairRing() throws RemoteException;
+    void repairRing(boolean aliveLeader) throws RemoteException;
 
     void disconnect() throws RemoteException;
 
@@ -82,15 +82,17 @@ public interface Node extends Remote {
 
     Map<Integer,Node> getNodes() throws RemoteException;
 
-    void executeTask(Task task) throws RemoteException;
+    void executeTask(Task task, int starter_id) throws RemoteException;
 
     int getVariable() throws RemoteException;
 
-    void changeVariable(int value, int starterId) throws RemoteException;
+//    void setVariable(int value) throws RemoteException;
 
     boolean isAvailable() throws RemoteException;
 
-    boolean isExecutable() throws RemoteException;
+    boolean isExecutable(int starter_id) throws RemoteException;
 
     boolean isLeader() throws RemoteException;
+
+    void gatherNodes() throws RemoteException;
 }

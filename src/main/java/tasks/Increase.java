@@ -9,6 +9,7 @@ public class Increase extends Task {
 
     @Override
     public void execute(NodeImpl node) {
+        super.execute(node);
         node.variable += integer;
     }
 }

@@ -2,12 +2,16 @@ package tasks;
 
 import nodes.NodeImpl;
 
-public abstract class Task {
+import java.io.Serializable;
+
+public abstract class Task implements Serializable {
 
     int integer;
 
+    public Task() {
+    }
+
     public Task(int integer) {
-        super();
         this.integer = integer;
     }
 
