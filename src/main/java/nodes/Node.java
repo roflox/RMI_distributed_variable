@@ -30,7 +30,7 @@ public interface Node extends Remote {
 
     Node getLeft() throws RemoteException;
 
-    Node getNext() throws RemoteException;
+    Node getRight() throws RemoteException;
 
     Node getLeader() throws RemoteException;
 

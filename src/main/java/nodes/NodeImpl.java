@@ -1,9 +1,7 @@
 package nodes;
 
-import tasks.Decrease;
-import tasks.Increase;
-import tasks.Task;
-import tasks.Wipe;
+import tasks.*;
+import tasks.Random;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +12,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.util.Set;
 
 
 public class NodeImpl implements Node, Runnable {
@@ -61,17 +60,6 @@ public class NodeImpl implements Node, Runnable {
 
         // Toto tu je, aby se dalo vzdáleně připojovat na nody.
         System.setProperty("java.rmi.server.hostname", hostname);
-//        boolean fun = (boolean) arguments.get("fun");
-
-        // Logger
-
-//        if (fun && !debug)
-//            printLogo();
-
-//        LOG.setLevel(Level.INFO);
-//        LOG.log(Level.ALL,String.format("Using RMI Registry host: %s:%s", registryHost, registryPort));
-//        LOG.debug(String.format("Using RMI Registry host: %s:%s", registryHost, registryPort));
-//        logger.info(String.format("Using RMI Registry host: %s:%s", registryHost, registryPort));
 
         if (development) {
             for (String key : arguments.keySet()) {
@@ -100,12 +88,15 @@ public class NodeImpl implements Node, Runnable {
         nodeImpl.run();
     }
 
+    /**
+     * @param objectPort port na kterem je objekt vystaveny
+     * @param registry registry rmi
+     * exportuje můj node do registru
+     */
     private void bindNode(int objectPort, Registry registry) {
         try {
             Node stub = (Node) UnicastRemoteObject.exportObject(this, objectPort);
             registry.rebind(name, stub);
-//            System.out.println("nodes.Node pushed into registry.");
-
         } catch (RemoteException e) {
             System.err.println("Port that you are trying to use is probably not available. Try again later.");
             e.printStackTrace();
@@ -113,6 +104,12 @@ public class NodeImpl implements Node, Runnable {
         }
     }
 
+    /**
+     * @param target jmeno nodu v registrech
+     * @param targetRegistryAddress ip adresa cilovych rmi registru
+     * @param targetRegistryPort port cilovych rmi registru
+     *     připojení nodu k jinému nodu, který je vystavený v RMI registrech
+     */
     private void connectToAnotherNode(String target, String targetRegistryAddress, int targetRegistryPort) {
         try {
             Registry registry = LocateRegistry.getRegistry(targetRegistryAddress, targetRegistryPort);
@@ -125,6 +122,9 @@ public class NodeImpl implements Node, Runnable {
         }
     }
 
+    /**
+     * řekne nodu aby se stal leaderem clusteru
+     */
     private void becomeLeader() {
         leader = this;
         if (left == null) {
@@ -134,12 +134,13 @@ public class NodeImpl implements Node, Runnable {
         if (allNodes.isEmpty()) {
             if (this.id == 0) {
                 id = 1;
-                variable = new Random().nextInt();
-                this.allNodes.put(id, this);
+                Task rand = new Random();
+                rand.execute(this);
+                allNodes.put(id, this);
             } else {
                 try {
-                    this.allNodes.putAll(right.getNodes());
-                    for (Node n:allNodes.values()) {
+                    allNodes.putAll(right.getNodes());
+                    for (Node n : allNodes.values()) {
                         n.setLeader(this);
                     }
                 } catch (RemoteException e) {
@@ -150,6 +151,12 @@ public class NodeImpl implements Node, Runnable {
         isLeader = true;
     }
 
+    /**
+     * @param name jméno objektu uloženého v RMI registrech, který se připojuje
+     * @param node node, který se připojuje
+     * @throws RemoteException
+     * připojení nodu, do klusteru
+     */
     @Override
     public synchronized void join(String name, Node node) throws RemoteException {
         System.out.println(String.format("%s is connecting.", name));
@@ -163,8 +170,8 @@ public class NodeImpl implements Node, Runnable {
         node.executeTask(new tasks.Set(variable), id);
         if (debug) {
             node.printInfo();
-            node.getNext().printInfo();
-            if (!node.getNext().equals(node.getLeft())) node.getLeft().printInfo();
+            node.getRight().printInfo();
+            if (!node.getRight().equals(node.getLeft())) node.getLeft().printInfo();
         }
     }
 
@@ -179,7 +186,7 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public Node getNext() {
+    public Node getRight() {
         return this.right;
     }
 
@@ -203,6 +210,10 @@ public class NodeImpl implements Node, Runnable {
         return this.name;
     }
 
+    /**
+     * @throws RemoteException
+     * printuje do konzole informace o nodu
+     */
     @Override
     public void printInfo() throws RemoteException {
         StringBuilder sb = new StringBuilder("\n");
@@ -271,6 +282,10 @@ public class NodeImpl implements Node, Runnable {
         this.id = id;
     }
 
+    /**
+     * @throws RemoteException
+     * odstartování leader electionu
+     */
     @Override
     public void election() throws RemoteException {
         Set<Integer> voters = this.right.elect(this.id);
