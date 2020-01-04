@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Bulk" type="CompoundRunConfigurationType">
+    <toRun name="Node2" type="Application" />
+    <toRun name="Node3" type="Application" />
+    <toRun name="Node4" type="Application" />
+    <toRun name="Node5" type="Application" />
+    <method v="2" />
+  </configuration>
+</component>

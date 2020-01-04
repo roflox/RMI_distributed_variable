@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.ServerError;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -24,7 +23,7 @@ public class NodeImpl implements Node, Runnable {
     Node right;
     Node left;
     Node leader;
-    Map<Integer, Node> allNodes = new HashMap<Integer, Node>();
+    Map<Integer, Node> allNodes = new HashMap<>();
     String name;
     int id = 0;
     public int variable;
@@ -61,7 +60,7 @@ public class NodeImpl implements Node, Runnable {
         String hostname = (String) arguments.get("hostname");
 
         // Toto tu je, aby se dalo vzdáleně připojovat na nody.
-        System.setProperty("java.rmi.server.hostname",hostname);
+        System.setProperty("java.rmi.server.hostname", hostname);
 //        boolean fun = (boolean) arguments.get("fun");
 
         // Logger
@@ -88,12 +87,14 @@ public class NodeImpl implements Node, Runnable {
             System.exit(1);
         }
         NodeImpl nodeImpl = new NodeImpl(nodeName, registry, port);
-        System.out.println(String.format("nodes.Node is using name: %s, port: %d,registry port: :%d", nodeName, port, registryPort));
+        System.out.println(String.format("nodes.Node is using name: %s, port: %d,registry " +
+                "port: :%d", nodeName, port, registryPort));
 
         if (target == null) {
             nodeImpl.becomeLeader();
         } else {
-            System.out.println(String.format("Trying to connect to %s with registry on %s:%d", target, targetRegistryAddress, targetRegistryPort));
+            System.out.println(String.format("Trying to connect to %s with registry " +
+                    "on %s:%d", target, targetRegistryAddress, targetRegistryPort));
             nodeImpl.connectToAnotherNode(target, targetRegistryAddress, targetRegistryPort);
         }
         nodeImpl.run();
@@ -118,17 +119,8 @@ public class NodeImpl implements Node, Runnable {
             Node node = (Node) registry.lookup(target);
             node.join(this.name, this);
         } catch (RemoteException | NotBoundException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
-
-    private void connectToAnotherNode(String target, Registry targetRegistry) {
-        try {
-            Node hostNode = (Node) targetRegistry.lookup(target);
-            hostNode.join(this.name, this);
-        } catch (RemoteException | NotBoundException e) {
-            e.printStackTrace();
+            System.err.println(String.format("Could not establish connection with %s:%s. Try it again or change " +
+                    "target to which you are trying to connect.", targetRegistryAddress, targetRegistryPort));
             System.exit(1);
         }
     }
@@ -147,6 +139,9 @@ public class NodeImpl implements Node, Runnable {
             } else {
                 try {
                     this.allNodes.putAll(right.getNodes());
+                    for (Node n:allNodes.values()) {
+                        n.setLeader(this);
+                    }
                 } catch (RemoteException e) {
                     System.err.println((e.getMessage()));
                 }
@@ -174,37 +169,37 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public Node getLeft() throws RemoteException {
+    public Node getLeft() {
         return this.left;
     }
 
     @Override
-    public synchronized void setLeft(Node left) throws RemoteException {
+    public synchronized void setLeft(Node left) {
         this.left = left;
     }
 
     @Override
-    public Node getNext() throws RemoteException {
+    public Node getNext() {
         return this.right;
     }
 
     @Override
-    public synchronized void setRight(Node right) throws RemoteException {
+    public synchronized void setRight(Node right) {
         this.right = right;
     }
 
     @Override
-    public Node getLeader() throws RemoteException {
+    public Node getLeader() {
         return this.leader;
     }
 
     @Override
-    public synchronized void setLeader(Node leader) throws RemoteException {
+    public synchronized void setLeader(Node leader) {
         this.leader = leader;
     }
 
     @Override
-    public String getName() throws RemoteException {
+    public String getName() {
         return this.name;
     }
 
@@ -267,12 +262,12 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public int getId() throws RemoteException {
+    public int getId() {
         return this.id;
     }
 
     @Override
-    public void setId(int id) throws RemoteException {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -295,7 +290,7 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public Node look(String starter, Path where) throws RemoteException {
+    public Node look(String starter, Path where) {
         if (starter != null) {
             if (starter.equals(this.name)) {
                 System.out.println("Ring is healthy.");
@@ -322,7 +317,7 @@ public class NodeImpl implements Node, Runnable {
         return null;
     }
 
-    public boolean isHealthy() throws RemoteException {
+    public boolean isHealthy() {
         try {
             this.right.ping();
             this.left.ping();
@@ -374,7 +369,7 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public void ping() throws RemoteException {
+    public void ping() {
 
     }
 
@@ -405,13 +400,13 @@ public class NodeImpl implements Node, Runnable {
         if (working) {
             System.err.println("Node is working right now, try it again later.");
             return;
-        } else  {
+        } else {
 //            System.out.println("is executable: " + leader.isExecutable());
             if (!isLeader && starter_id != id) {
                 working = true;
                 waitSec();
                 task.execute(this);
-            } else if(leader.isExecutable(starter_id)) {
+            } else if (leader.isExecutable(starter_id)) {
                 working = true;
 //                System.out.println("isLeader: " + isLeader);
                 if (isLeader) {
@@ -429,38 +424,22 @@ public class NodeImpl implements Node, Runnable {
             }
         }
         working = false;
-//        System.out.println(working);
-//        if (working) {
-//            tasks.add(task);
-//            return;
-//        }
-//        if (this.leader.isExecutable() && !working) {
-//            working = true;
-//            task.execute(this);
-//            leader.ping();
-//            this.leader.changeVariable(this.variable, this.id);
-//        }
-//        if (tasks.isEmpty()) {
-//            working = false;
-//        } else {
-//            executeTask(tasks.remove(0));
-//        }
     }
 
     @Override
-    public int getVariable() throws RemoteException {
+    public int getVariable() {
         return this.variable;
     }
 
 
-    public boolean isAvailable() throws RemoteException {
+    public boolean isAvailable() {
         return !working;
     }
 
     @Override
     public boolean isExecutable(int starter_id) throws RemoteException {
         for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
-            if (!n.getValue().isAvailable()&&starter_id!=n.getKey()) {
+            if (!n.getValue().isAvailable() && starter_id != n.getKey()) {
                 if (debug)
                     System.out.println("not executable, node " + n.getKey() + " is working");
                 return false;
@@ -469,49 +448,19 @@ public class NodeImpl implements Node, Runnable {
         return true;
     }
 
-//    @Override
-//    public synchronized void setVariable(int value) throws RemoteException {
-//        this.variable = value;
-//        working = true;
-//        if (starterId != this.id && debug)
-//            System.out.println(String.format("Node: %s is changing variable %d to %d", starterId, this.variable, value));
-//        if (isLeader) {
-//            for (Map.Entry<Integer, Node> i : allNodes.entrySet()) {
-////                System.out.println("changing on node: " + i.getKey());
-//                if (i.getKey() != starterId && !i.getValue().isLeader()) {
-//                    i.getValue().setVariable(value, starterId);
-//                } else if (i.getValue().isLeader()) {
-//                    synchronized (this) {
-//                        this.variable = value;
-//                    }
-//                }
-//            }
-//        } else {
-//            synchronized (this) {
-////                try{wait(1000);}
-////                catch (Exception e){
-////                    e.printStackTrace();
-////                }
-//                this.variable = value;
-//            }
-//        }
-//        this.working = false;
-//    }
-
     private void printHelp() {
         System.out.println("Available commands are:");
-        System.out.println("\t\t\t\\i - to print info");
-        System.out.println("\t\t\t\\q - to gently shutdown node");
-        System.out.println("\t\t\t\\h - for this message");
-        System.out.println("\t\t\t\\a - adding 1 to current value of shared variable");
-        System.out.println("\t\t\t\\s - subtracting 1 from current value of shared variable");
-        System.out.println("\t\t\t\\w - for setting current value of variable to 0");
-        System.out.println("\t\t\t\\r - generate new random variable");
+        System.out.println("\t\t\ti or info - to print info");
+        System.out.println("\t\t\tq or quit - to gently shutdown node");
+        System.out.println("\t\t\ta or add - adding 1 to current value of shared variable");
+        System.out.println("\t\t\ts or subtract - subtracting 1 from current value of shared variable");
+        System.out.println("\t\t\tw or wipe - for setting current value of variable to 0");
+        System.out.println("\t\t\tr or random - generate new random variable");
     }
 
     @Override
     public void run() {
-        System.out.println("To see all commands, just write \\h and hit enter.");
+        System.out.println("To see all commands, just hit enter.");
         BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
         String input;
         while (true) {
@@ -519,31 +468,35 @@ public class NodeImpl implements Node, Runnable {
                 input = bf.readLine();
                 Task task = null;
                 switch (input) {
-                    case "\\q":
+                    case "quit":
+                    case "q":
                         disconnect();
                         break;
-                    case "\\i":
+                    case "info":
+                    case "i":
                         printInfo();
                         break;
-                    case "\\e":
+                    case "election":
+                    case "e":
                         election();
                         break;
-                    case "\\h":
-                        printHelp();
-                        break;
-                    case "\\a":
+                    case "add":
+                    case "a":
                         task = new Increase(1);
 //                        executeTask(new Increase(1),this.id);
                         break;
-                    case "\\s":
+                    case "subtract":
+                    case "s":
                         task = new Decrease(1);
 //                        executeTask(new Decrease(1),this.id);
                         break;
-                    case "\\w":
+                    case "wipe":
+                    case "w":
                         task = new Wipe();
 //                        executeTask(new Wipe(),id);
                         break;
-                    case "\\r":
+                    case "random":
+                    case "r":
                         task = new tasks.Random();
 //                        executeTask(new tasks.Random(),id);
                         break;
@@ -569,7 +522,7 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public boolean isLeader() throws RemoteException {
+    public boolean isLeader() {
         return isLeader;
     }
 
