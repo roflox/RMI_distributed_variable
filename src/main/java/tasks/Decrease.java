@@ -3,8 +3,8 @@ package tasks;
 import nodes.NodeImpl;
 
 public class Decrease extends Task {
-    public Decrease(int integer) {
-        super(integer);
+    public Decrease(int integer, int starter_id) {
+        super(integer,starter_id);
     }
 
     @Override

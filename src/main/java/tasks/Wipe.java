@@ -3,8 +3,8 @@ package tasks;
 import nodes.NodeImpl;
 
 public class Wipe extends Task {
-    public Wipe() {
-        super();
+    public Wipe(int starter_id) {
+        super(starter_id);
     }
 
     @Override

@@ -31,7 +31,8 @@ public class NodeImpl implements Node, Runnable {
     public int variable;
     private boolean working = false;
     boolean isLeader = false;
-    ArrayList<Pair<Integer, Task>> taskQueue;
+    List<Task> taskQueue;
+
 
     public NodeImpl(String name, Registry registry, int objectPort) {
         this.name = name;
@@ -132,12 +133,13 @@ public class NodeImpl implements Node, Runnable {
         if (left == null) {
             setLeft(new Pair<>(id, this));
             setRight(new Pair<>(id, this));
-            setLeader(new Pair<>(id, this));
+            leader = this;
         }
         if (allNodes.isEmpty()) {
-            if (this.id == 0) {
+            if (id == 0) {
                 id = 1;
-                Task rand = new Random();
+                leader_id = 1;
+                Task rand = new Random(id);
                 rand.execute(this);
                 allNodes.put(id, this);
             } else {
@@ -171,7 +173,7 @@ public class NodeImpl implements Node, Runnable {
         right = node;
         right_id = node.getId();
 //        node.setVariable(this.variable);
-        node.executeTask(new tasks.Set(variable), id);
+        node.executeTask(new tasks.Set(variable, id));
         if (debug) {
             node.printInfo();
             node.getRight().getValue().printInfo();
@@ -413,33 +415,31 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public synchronized void executeTask(Task task, int starter_id) throws RemoteException {
+    public synchronized void executeTask(Task task) throws RemoteException {
         if (task == null)
             return;
-        System.out.println(String.format("executing task: %s initiated by %s", task.getClass().toString(), starter_id));
+        System.out.println(String.format("executing task: %s initiated by %s", task.getClass().toString(), task.getStarter()));
         if (debug)
             waitSec();
         try {
-            if (!isLeader && starter_id != id) {
+            if (!isLeader && task.getStarter() != id) {
                 working = true;
                 waitSec();
                 task.execute(this);
-            } else if (leader.isExecutable(starter_id)) {
+            } else if (leader.isExecutable(task.getStarter())) {
                 working = true;
                 if (isLeader) {
                     for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
-                        if (starter_id != n.getKey() && !n.getValue().isLeader()) {
-                            if (debug)
-                                waitSec();
-                            n.getValue().executeTask(task, starter_id);
+                        if (task.getStarter() != n.getKey() && !n.getValue().isLeader()) {
+                            n.getValue().executeTask(task);
                         }
                     }
                 } else {
-                    this.leader.executeTask(task, starter_id);
+                    this.leader.executeTask(task);
                 }
                 task.execute(this);
             } else {
-                leader.addTaskToQueue(new Pair<>(starter_id, task));
+                leader.addTaskToQueue(task);
                 return;
             }
         } catch (RemoteException e) {
@@ -448,7 +448,7 @@ public class NodeImpl implements Node, Runnable {
             } else {
                 repairRing(false);
             }
-            this.leader.executeTask(new tasks.Set(variable), starter_id);
+            this.leader.executeTask(new tasks.Set(variable, id));
         }
         working = false;
         executeQueue();
@@ -462,6 +462,7 @@ public class NodeImpl implements Node, Runnable {
     public boolean isExecutable(int starter_id) throws RemoteException {
         for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
             if (!n.getValue().isAvailable() && starter_id != n.getKey()) {
+                System.err.println("Not executable because "+n.getKey() + " is working on something....");
                 return false;
             }
         }
@@ -502,19 +503,19 @@ public class NodeImpl implements Node, Runnable {
                         break;
                     case "add":
                     case "a":
-                        task = new Increase(1);
+                        task = new Increase(1, id);
                         break;
                     case "subtract":
                     case "s":
-                        task = new Decrease(1);
+                        task = new Decrease(1, id);
                         break;
                     case "wipe":
                     case "w":
-                        task = new Wipe();
+                        task = new Wipe(id);
                         break;
                     case "random":
                     case "r":
-                        task = new tasks.Random();
+                        task = new tasks.Random(id);
                         break;
                     case "debug":
                     case "d":
@@ -523,7 +524,7 @@ public class NodeImpl implements Node, Runnable {
                     default:
                         printHelp();
                 }
-                this.executeTask(task, id);
+                this.executeTask(task);
             } catch (RemoteException e) {
                 System.err.println("Topology is damaged.");
                 e.printStackTrace();
@@ -555,10 +556,11 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public boolean addTaskToQueue(Pair<Integer, Task> taskPair) throws RemoteException {
-        System.err.println("adding task to queue");
-        if (!taskQueue.contains(taskPair)) {
-            taskQueue.add(taskPair);
+    public boolean addTaskToQueue(Task task) throws RemoteException {
+        System.err.println(String.format("adding %s initiated by %s to the queue", task.getClass().toString(), task.getStarter()));
+        printQueue();
+        if (!taskQueue.contains(task)) {
+            taskQueue.add(task);
             return true;
         } else {
             System.err.println("Same task is already in the queue!");
@@ -573,10 +575,12 @@ public class NodeImpl implements Node, Runnable {
 
     private void executeQueue() throws RemoteException {
         if (isLeader) {
+            waitCustom(2);
+            printQueue();
+            System.out.println("is executable:"+isExecutable(id));
             if (!taskQueue.isEmpty()) {
-                System.out.println("executing task from queue (" + taskQueue.size() + ")");
-                var toExecute = taskQueue.remove(0);
-                executeTask(toExecute.getValue(), toExecute.getKey());
+                System.out.println("executing task from queue (" + taskQueue.size() + ")\n");
+                executeTask(taskQueue.remove(0));
             }
         }
     }
@@ -589,4 +593,37 @@ public class NodeImpl implements Node, Runnable {
         }
     }
 
+    private void waitCustom(int seconds) {
+        try {
+            wait(seconds * 1000);
+        } catch (Exception e) {
+            System.err.println("Cannot wait!");
+        }
+    }
+
+    private void printQueue() {
+        if (isLeader) {
+            if (debug) {
+                StringBuilder sb = new StringBuilder();
+                for (Task queued : taskQueue) {
+                    sb.append(queued).append(", ");
+                }
+                System.out.println("\nQueued tasks:\n" + sb.toString());
+            }
+        }
+    }
+
+    public void clearScreen() {
+        try {
+            final String os = System.getProperty("os.name");
+
+            if (os.contains("Windows")) {
+                Runtime.getRuntime().exec("cls");
+            } else {
+                Runtime.getRuntime().exec("clear");
+            }
+        }catch (Exception e){
+            System.err.println("Cannot clean console.");
+        }
+    }
 }

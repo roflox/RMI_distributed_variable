@@ -80,7 +80,7 @@ public interface Node extends Remote {
 
     Map<Integer, Node> getNodes(int starter_id) throws RemoteException;
 
-    void executeTask(Task task, int starter_id) throws RemoteException;
+    void executeTask(Task task) throws RemoteException;
 
     boolean isAvailable() throws RemoteException;
 
@@ -90,7 +90,7 @@ public interface Node extends Remote {
 
     void gatherNodes() throws RemoteException;
 
-    boolean addTaskToQueue(Pair<Integer,Task> taskPair) throws RemoteException;
+    boolean addTaskToQueue(Task t) throws RemoteException;
 
     Pair<Integer, Node> getLeader() throws RemoteException;
 }

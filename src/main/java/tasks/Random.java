@@ -3,7 +3,8 @@ package tasks;
 import nodes.NodeImpl;
 
 public class Random extends Task {
-    public Random() {
+    public Random(int starter_id) {
+        super(starter_id);
     }
 
     @Override
