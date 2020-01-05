@@ -1,5 +1,6 @@
 package nodes;
 
+import javafx.util.Pair;
 import tasks.*;
 import tasks.Random;
 
@@ -20,14 +21,19 @@ public class NodeImpl implements Node, Runnable {
     private static boolean debug = false;
     //    private static final Logger LOG = LogManager.getLogger(nodes.NodeImpl.class);
     Node right;
+    int right_id;
     Node left;
+    int left_id;
     Node leader;
+    int leader_id;
     Map<Integer, Node> allNodes = new HashMap<>();
     String name;
     int id = 0;
     public int variable;
     private boolean working = false;
     boolean isLeader = false;
+    ArrayList<Pair<Integer, Task>> taskQueue;
+
 
     public NodeImpl(String name, Registry registry, int objectPort) {
         this.name = name;
@@ -90,8 +96,8 @@ public class NodeImpl implements Node, Runnable {
 
     /**
      * @param objectPort port na kterem je objekt vystaveny
-     * @param registry registry rmi
-     * exportuje můj node do registru
+     * @param registry   registry rmi
+     *                   exportuje můj node do registru
      */
     private void bindNode(int objectPort, Registry registry) {
         try {
@@ -99,16 +105,15 @@ public class NodeImpl implements Node, Runnable {
             registry.rebind(name, stub);
         } catch (RemoteException e) {
             System.err.println("Port that you are trying to use is probably not available. Try again later.");
-            e.printStackTrace();
             System.exit(1);
         }
     }
 
     /**
-     * @param target jmeno nodu v registrech
+     * @param target                jmeno nodu v registrech
      * @param targetRegistryAddress ip adresa cilovych rmi registru
-     * @param targetRegistryPort port cilovych rmi registru
-     *     připojení nodu k jinému nodu, který je vystavený v RMI registrech
+     * @param targetRegistryPort    port cilovych rmi registru
+     *                              připojení nodu k jinému nodu, který je vystavený v RMI registrech
      */
     private void connectToAnotherNode(String target, String targetRegistryAddress, int targetRegistryPort) {
         try {
@@ -126,10 +131,11 @@ public class NodeImpl implements Node, Runnable {
      * řekne nodu aby se stal leaderem clusteru
      */
     private void becomeLeader() {
-        leader = this;
+        taskQueue = new ArrayList<>();
         if (left == null) {
-            left = this;
-            right = this;
+            setLeft(new Pair<>(id, this));
+            setRight(new Pair<>(id, this));
+            setLeader(new Pair<>(id, this));
         }
         if (allNodes.isEmpty()) {
             if (this.id == 0) {
@@ -139,9 +145,10 @@ public class NodeImpl implements Node, Runnable {
                 allNodes.put(id, this);
             } else {
                 try {
-                    allNodes.putAll(right.getNodes());
+                    allNodes.put(id, this);
+                    allNodes.putAll(right.getNodes(id));
                     for (Node n : allNodes.values()) {
-                        n.setLeader(this);
+                        n.setLeader(new Pair<>(id, this));
                     }
                 } catch (RemoteException e) {
                     System.err.println((e.getMessage()));
@@ -154,55 +161,54 @@ public class NodeImpl implements Node, Runnable {
     /**
      * @param name jméno objektu uloženého v RMI registrech, který se připojuje
      * @param node node, který se připojuje
-     * @throws RemoteException
-     * připojení nodu, do klusteru
+     * @throws RemoteException připojení nodu, do klusteru
      */
     @Override
     public synchronized void join(String name, Node node) throws RemoteException {
         System.out.println(String.format("%s is connecting.", name));
-        node.setLeader(this.leader);
-        node.setRight(this.right);
-        this.right.setLeft(node);
-        node.setLeft(this);
-        this.right = node;
-        this.leader.joinSet(node);
+        node.setLeader(new Pair<>(leader_id, leader));
+        leader.addNode(node);
+        node.setRight(new Pair<>(right_id, right));
+        right.setLeft(new Pair<>(node.getId(), node));
+        node.setLeft(new Pair<>(id, this));
+        right = node;
+        right_id = node.getId();
 //        node.setVariable(this.variable);
         node.executeTask(new tasks.Set(variable), id);
         if (debug) {
             node.printInfo();
-            node.getRight().printInfo();
-            if (!node.getRight().equals(node.getLeft())) node.getLeft().printInfo();
+            node.getRight().getValue().printInfo();
+            if (!node.getRight().equals(node.getLeft())) node.getLeft().getValue().printInfo();
         }
     }
 
     @Override
-    public Node getLeft() {
-        return this.left;
+    public Pair<Integer, Node> getLeft() {
+        return new Pair<>(left_id, left);
     }
 
     @Override
-    public synchronized void setLeft(Node left) {
-        this.left = left;
+    public synchronized void setLeft(Pair<Integer, Node> left) {
+        this.left = left.getValue();
+        this.left_id = left.getKey();
     }
 
     @Override
-    public Node getRight() {
-        return this.right;
+    public Pair<Integer, Node> getRight() {
+        return new Pair<>(right_id, right);
     }
 
     @Override
-    public synchronized void setRight(Node right) {
-        this.right = right;
+    public synchronized void setRight(Pair<Integer, Node> right) {
+        this.right = right.getValue();
+        this.right_id = right.getKey();
     }
 
-    @Override
-    public Node getLeader() {
-        return this.leader;
-    }
 
     @Override
-    public synchronized void setLeader(Node leader) {
-        this.leader = leader;
+    public synchronized void setLeader(Pair<Integer, Node> leader) {
+        this.leader_id = leader.getKey();
+        this.leader = leader.getValue();
     }
 
     @Override
@@ -211,54 +217,56 @@ public class NodeImpl implements Node, Runnable {
     }
 
     /**
-     * @throws RemoteException
-     * printuje do konzole informace o nodu
+     * @throws RemoteException printuje do konzole informace o nodu
      */
     @Override
     public void printInfo() throws RemoteException {
         StringBuilder sb = new StringBuilder("\n");
         boolean broken = false;
         boolean aliveLeader = true;
-        if (this.right != null) {
-            try {
-                sb.append("Right: ").append(this.right.getName()).append(" id: ").append(this.right.getId()).append(", ");
-            } catch (RemoteException e) {
-                sb.append("Right node is dead");
-                broken = true;
-//                sb.append("New Right node is:").append(this.right.getName()).append(", ");
-            }
-        }
         if (this.left != null) {
             try {
-                sb.append("Left: ").append(this.left.getName()).append(" id: ").append(this.left.getId()).append(", ");
+                sb.append("Left: ").append(this.left.getName()).append(" id: ").append(this.left_id).append(", ");
             } catch (RemoteException e) {
                 sb.append("Left node is dead, ");
                 broken = true;
 //                sb.append("New Left node is:").append(this.left.getName()).append(", ");
             }
         }
+        if (this.right != null) {
+            try {
+                sb.append("Right: ").append(this.right.getName()).append(" id: ").append(this.right_id).append("\n");
+            } catch (RemoteException e) {
+                sb.append("Right node is dead\n");
+                broken = true;
+//                sb.append("New Right node is:").append(this.right.getName()).append(", ");
+            }
+        }
         if (this.leader != null) {
             try {
-                sb.append("Leader: ").append(this.leader.getName()).append(" id: ").append(this.leader.getId());
-                if (this.leader.getId() == this.id) {
-                    sb.append("\n This node is leader, all nodes: ");
+                if (this.isLeader) {
+                    sb.append("This node is leader, all nodes: ");
                     for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
                         try {
                             sb.append(n.getValue().getName()).append(", id:").append(n.getKey()).append("; ");
                         } catch (RemoteException e) {
                             sb.append(String.format("Node id: %d is dead; ", n.getKey()));
                             broken = true;
-
                         }
                     }
+                    sb.append("\nNumber of tasks in queue:").append(taskQueue.size()).append("\n");
+                } else {
+                    sb.append("Leader: ")
+                            .append(this.leader.getName())
+                            .append(" id: ")
+                            .append(this.leader_id).append("\n");
                 }
             } catch (RemoteException e) {
-                sb.append("Leader node is dead");
+                sb.append("Leader node is dead\n");
                 aliveLeader = false;
             }
-
         }
-        sb.append(" variable: ").append(variable);
+        sb.append("Variable: ").append(variable).append("\n");
         System.out.println(sb.toString());
         if (broken) {
             this.repairRing(aliveLeader);
@@ -267,8 +275,8 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public synchronized void joinSet(Node node) throws RemoteException {
-        node.setId(allNodes.size() + 1);
+    public synchronized void addNode(Node node) throws RemoteException {
+        node.setId(allNodes.keySet().stream().max(Comparator.comparing(Integer::intValue)).get() + 1);
         this.allNodes.put(node.getId(), node);
     }
 
@@ -283,24 +291,24 @@ public class NodeImpl implements Node, Runnable {
     }
 
     /**
-     * @throws RemoteException
-     * odstartování leader electionu
+     * @throws RemoteException odstartování leader electionu
      */
     @Override
     public void election() throws RemoteException {
-        Set<Integer> voters = this.right.elect(this.id);
+        Set<Integer> voters = right.voteLeader(this.id);
         int newLeaderId = voters.stream().min(Integer::compareTo).get();
         newLeader(newLeaderId);
     }
 
     @Override
-    public Set<Integer> elect(int starter) throws RemoteException {
+    public Set<Integer> voteLeader(int starter) throws RemoteException {
         Set<Integer> ids = new HashSet<>();
-        ids.add(this.id);
-        if (this.id == starter) {
-            return ids;
+        ids.add(id);
+        if (right_id == starter) {
+            ids.add(starter);
+        } else {
+            ids.addAll(right.voteLeader(starter));
         }
-        ids.addAll(right.elect(starter));
         return ids;
     }
 
@@ -346,17 +354,13 @@ public class NodeImpl implements Node, Runnable {
     public void repairRing(boolean aliveLeader) throws RemoteException {
         Node lookRight = this.look(null, Path.right);
         Node lookLeft = this.look(null, Path.left);
-        System.err.println("Topology is broken. Repair process is started.");
+        System.err.println("Topology is broken. Repair process is started. Alive leader:" + aliveLeader);
         if (!lookLeft.equals(lookRight) || !isHealthy()) {
-            lookLeft.setLeft(lookRight);
-            lookRight.setRight(lookLeft);
+            lookLeft.setLeft((new Pair<>(lookRight.getId(), lookRight)));
+            lookRight.setRight((new Pair<>(lookLeft.getId(), lookLeft)));
 
         }
-        System.err.println("Topology should be repaired.");
-//        if (debug) {
-//            lookLeft.printInfo();
-//            lookRight.printInfo();
-//        }
+        System.err.println("Topology should be repaired. Gonna start election: " + !aliveLeader);
         if (aliveLeader)
             this.leader.gatherNodes();
         else
@@ -366,20 +370,23 @@ public class NodeImpl implements Node, Runnable {
     @Override
     public void disconnect() throws RemoteException {
         synchronized (this) {
-            if (this.left.getId() != this.id) {
-                this.left.setRight(this.right);
-                this.right.setLeft(this.left);
-                this.left.printInfo();
-                if (this.left.getId() != this.right.getId())
-                    this.right.printInfo();
+            if (left_id != id) {
+                left.printInfo();
+                right.printInfo();
+                left.setRight(new Pair<>(right_id, right));
+                right.setLeft(new Pair<>(left_id, left));
+                left.printInfo();
+                right.printInfo();
             }
         }
-
-        if (this.leader.getId() == this.id && this.left.getId() != this.id) {
-            this.left.election();
+        if (isLeader && right_id != id) {
+            right.election();
         }
         //TODO odevzdat práci počkat na ukončení atd.
         System.out.println(String.format("%s is disconnecting.", name));
+        if (isLeader) {
+            System.out.println("Newly elected leader is: " + right.getLeader().getKey());
+        }
         System.exit(1);
     }
 
@@ -398,11 +405,11 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public Map<Integer, Node> getNodes() throws RemoteException {
+    public Map<Integer, Node> getNodes(int starter_id) throws RemoteException {
         HashMap<Integer, Node> nodes = new HashMap<>();
-        if (this.id != leader.getId()) {
+        if (this.id != starter_id) {
             nodes.put(this.id, this);
-            nodes.putAll(right.getNodes());
+            nodes.putAll(right.getNodes(starter_id));
         }
         return nodes;
     }
@@ -411,11 +418,11 @@ public class NodeImpl implements Node, Runnable {
     public synchronized void executeTask(Task task, int starter_id) throws RemoteException {
         if (task == null)
             return;
-        System.out.println("executing task:" + task.getClass().toString());
-        if (working) {
-            System.err.println("Node is working right now, try it again later.");
-            return;
-        } else {
+        System.out.println(String.format("executing task: %s initiated by %s", task.getClass().toString(), starter_id));
+        if (debug)
+            waitSec();
+        try {
+
 //            System.out.println("is executable: " + leader.isExecutable());
             if (!isLeader && starter_id != id) {
                 working = true;
@@ -428,7 +435,8 @@ public class NodeImpl implements Node, Runnable {
                     for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
 //                        System.out.println("isStarter: " + (starter_id == n.getKey()));
                         if (starter_id != n.getKey() && !n.getValue().isLeader()) {
-                            waitSec();
+                            if (debug)
+                                waitSec();
                             n.getValue().executeTask(task, starter_id);
                         }
                     }
@@ -436,14 +444,20 @@ public class NodeImpl implements Node, Runnable {
                     this.leader.executeTask(task, starter_id);
                 }
                 task.execute(this);
+            } else {
+                leader.addTaskToQueue(new Pair<>(starter_id, task));
+                return;
             }
+        } catch (RemoteException e) {
+            if (isLeader) {
+                repairRing(true);
+            } else {
+                repairRing(false);
+            }
+            this.leader.executeTask(new tasks.Set(variable), starter_id);
         }
         working = false;
-    }
-
-    @Override
-    public int getVariable() {
-        return this.variable;
+        executeQueue();
     }
 
 
@@ -455,8 +469,6 @@ public class NodeImpl implements Node, Runnable {
     public boolean isExecutable(int starter_id) throws RemoteException {
         for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
             if (!n.getValue().isAvailable() && starter_id != n.getKey()) {
-                if (debug)
-                    System.out.println("not executable, node " + n.getKey() + " is working");
                 return false;
             }
         }
@@ -515,6 +527,10 @@ public class NodeImpl implements Node, Runnable {
                         task = new tasks.Random();
 //                        executeTask(new tasks.Random(),id);
                         break;
+                    case "debug":
+                    case "d":
+                        executeQueue();
+                        break;
                     default:
                         printHelp();
                 }
@@ -544,14 +560,42 @@ public class NodeImpl implements Node, Runnable {
     @Override
     public void gatherNodes() throws RemoteException {
         if (isLeader) {
-            this.allNodes = getNodes();
+            allNodes = new HashMap<>();
+            allNodes.putAll(right.getNodes(id));
+        }
+    }
+
+    @Override
+    public boolean addTaskToQueue(Pair<Integer, Task> taskPair) throws RemoteException {
+        System.err.println("adding task to queue");
+        if (!taskQueue.contains(taskPair)) {
+            taskQueue.add(taskPair);
+            return true;
+        } else {
+            System.err.println("Same task is already in the queue!");
+            return false;
+        }
+    }
+
+    @Override
+    public Pair<Integer, Node> getLeader() throws RemoteException {
+        return new Pair<Integer, Node>(leader_id, leader);
+    }
+
+    private void executeQueue() throws RemoteException {
+        if (isLeader) {
+            if (!taskQueue.isEmpty()) {
+                System.out.println("executing task from queue (" + taskQueue.size() + ")");
+                var toExecute = taskQueue.remove(0);
+                executeTask(toExecute.getValue(), toExecute.getKey());
+            }
         }
     }
 
 
     private void waitSec() {
         try {
-            wait(1000);
+            wait(500);
         } catch (Exception e) {
             System.err.println("Cannot wait!");
         }

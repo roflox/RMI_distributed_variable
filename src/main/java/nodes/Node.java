@@ -1,5 +1,6 @@
 package nodes;
 
+import javafx.util.Pair;
 import tasks.Task;
 
 import java.rmi.Remote;
@@ -11,28 +12,26 @@ public interface Node extends Remote {
 
     /**
      * @param name     jméno objektu uloženého v RMI registrech
-     * @param nodeImpl samotný nodes.Node, který se připojuje do systému
+     * @param node samotný nodes.Node, který se připojuje do systému
      * @throws RemoteException -
      */
-    void join(String name, Node nodeImpl) throws RemoteException;
+    void join(String name, Node node) throws RemoteException;
 
     /**
-     * @param next nový node, který bude označený jako next
+     * @param right nový node, který bude označený jako next
      * @throws RemoteException -
      */
-    void setRight(Node next) throws RemoteException;
+    void setRight(Pair<Integer,Node> right) throws RemoteException;
 
     /**
-     * @param prev nový node který bude označen jako Previous
+     * @param left nový node který bude označen jako Previous
      * @throws RemoteException -
      */
-    void setLeft(Node prev) throws RemoteException;
+    void setLeft(Pair<Integer,Node> left) throws RemoteException;
 
-    Node getLeft() throws RemoteException;
+    Pair<Integer, Node> getLeft() throws RemoteException;
 
-    Node getRight() throws RemoteException;
-
-    Node getLeader() throws RemoteException;
+    Pair<Integer, Node> getRight() throws RemoteException;
 
     /**
      * @return vrací název Nodu v RMI registrech
@@ -51,13 +50,13 @@ public interface Node extends Remote {
      * @param leader nový leader
      * @throws RemoteException -
      */
-    void setLeader(Node leader) throws RemoteException;
+    void setLeader(Pair<Integer,Node> leader) throws RemoteException;
 
     /**
-     * @param nodeImpl node která bude přidaná do Setu leader nody
+     * @param node node která bude přidaná do Setu leader nody
      * @throws RemoteException -
      */
-    void joinSet(Node nodeImpl) throws RemoteException;
+    void addNode(Node node) throws RemoteException;
 
     int getId() throws RemoteException;
 
@@ -65,10 +64,9 @@ public interface Node extends Remote {
 
     void election() throws RemoteException;
 
-    Set<Integer> elect(int starter) throws RemoteException;
+    Set<Integer> voteLeader(int starter) throws RemoteException;
 
     Node look(String starter, Path where) throws RemoteException;
-
 
     boolean isHealthy() throws RemoteException;
 
@@ -80,13 +78,9 @@ public interface Node extends Remote {
 
     void newLeader(int id) throws RemoteException;
 
-    Map<Integer,Node> getNodes() throws RemoteException;
+    Map<Integer, Node> getNodes(int starter_id) throws RemoteException;
 
     void executeTask(Task task, int starter_id) throws RemoteException;
-
-    int getVariable() throws RemoteException;
-
-//    void setVariable(int value) throws RemoteException;
 
     boolean isAvailable() throws RemoteException;
 
@@ -95,4 +89,8 @@ public interface Node extends Remote {
     boolean isLeader() throws RemoteException;
 
     void gatherNodes() throws RemoteException;
+
+    boolean addTaskToQueue(Pair<Integer,Task> taskPair) throws RemoteException;
+
+    Pair<Integer, Node> getLeader() throws RemoteException;
 }

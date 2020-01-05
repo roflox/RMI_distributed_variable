@@ -318,10 +318,11 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="48" y="0" key="#org.jetbrains.kotlin.idea.refactoring.safeDelete.KotlinOverridingDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1575573710427" />
-    <state x="327" y="116" key="CommitChangelistDialog2" timestamp="1576349655314">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state x="368" y="144" width="945" height="816" key="CommitChangelistDialog2" timestamp="1578176135974">
+      <screen x="50" y="27" width="1870" height="1053" />
     </state>
     <state x="327" y="116" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1576349655314" />
+    <state x="368" y="144" width="945" height="816" key="CommitChangelistDialog2/50.27.1870.1053@50.27.1870.1053" timestamp="1578176135974" />
     <state x="876" y="298" key="DetectedRootsChooserDialog" timestamp="1575474370452">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -375,10 +376,11 @@
     </state>
     <state x="602" y="157" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1577030770333" />
     <state x="636" y="186" width="1024" height="852" key="SettingsEditor/50.27.1870.1053@50.27.1870.1053" timestamp="1578164191162" />
-    <state x="307" y="256" key="Vcs.Push.Dialog.v2" timestamp="1576349657930">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state x="349" y="286" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1578176143421">
+      <screen x="50" y="27" width="1870" height="1053" />
     </state>
     <state x="307" y="256" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1576349657930" />
+    <state x="349" y="286" width="800" height="535" key="Vcs.Push.Dialog.v2/50.27.1870.1053@50.27.1870.1053" timestamp="1578176143421" />
     <state x="826" y="476" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1575474292094">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
