@@ -130,15 +130,12 @@ public class NodeImpl implements Node, Runnable {
      */
     private void becomeLeader() {
         taskQueue = new ArrayList<>();
-        if (left == null) {
-            setLeft(new Pair<>(id, this));
-            setRight(new Pair<>(id, this));
-            leader = this;
-        }
         if (allNodes.isEmpty()) {
             if (id == 0) {
                 id = 1;
-                leader_id = 1;
+                setLeft(new Pair<>(id, this));
+                setRight(new Pair<>(id, this));
+                setLeader(new Pair<>(id,this));
                 Task rand = new Random(id);
                 rand.execute(this);
                 allNodes.put(id, this);
@@ -222,6 +219,7 @@ public class NodeImpl implements Node, Runnable {
         StringBuilder sb = new StringBuilder("\n");
         boolean broken = false;
         boolean aliveLeader = true;
+        sb.append("node_id").append(id).append("\n");
         if (this.left != null) {
             try {
                 sb.append("Left: ").append(this.left.getName()).append(" id: ").append(this.left_id).append(", ");
@@ -266,6 +264,7 @@ public class NodeImpl implements Node, Runnable {
         }
         sb.append("Variable: ").append(variable).append("\n");
         System.out.println(sb.toString());
+        printQueue();
         if (broken) {
             this.repairRing(aliveLeader);
         }
@@ -422,24 +421,29 @@ public class NodeImpl implements Node, Runnable {
         if (debug)
             waitSec();
         try {
-            if (!isLeader && task.getStarter() != id) {
+
+            if (!isLeader && task.getStarter() != id) { // toto ani nevim proc tu je :D
+                System.out.println("vetev A + working");
                 working = true;
                 waitSec();
                 task.execute(this);
-            } else if (leader.isExecutable(task.getStarter())) {
+            } else if (leader.isExecutable(task)) { // pro leadera
+                System.out.println("vetev B + working");
                 working = true;
-                if (isLeader) {
+                if (isLeader) { // toto rika leaderovi ze ma executnout ty tasky na "poddanych" nebo jak je nazvat
                     for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
-                        if (task.getStarter() != n.getKey() && !n.getValue().isLeader()) {
+                        if (task.getStarter() != n.getKey() && !n.getValue().isLeader()) { //toto je tu aby se to nezacyklilo, aby si leader nedal znova za ukol ten task, a nebo aby to nedal za ukol starterovi
                             n.getValue().executeTask(task);
-                        }
+                        }// nevim co dal...
                     }
-                } else {
+                    System.err.println("Executed on all other nodes.");
+                } else { // pro startera
+
                     this.leader.executeTask(task);
                 }
-                task.execute(this);
+                task.execute(this); // jo jasne, toto je to pro leadera a pro startera
             } else {
-                leader.addTaskToQueue(task);
+                leader.addTaskToQueue(task); // tady to dava do fronty
                 return;
             }
         } catch (RemoteException e) {
@@ -450,8 +454,10 @@ public class NodeImpl implements Node, Runnable {
             }
             this.leader.executeTask(new tasks.Set(variable, id));
         }
+        System.out.println(id+" "+working);
         working = false;
-        executeQueue();
+        System.out.println(id+" "+working);
+        leader.executeQueue(); // klikni na to s C
     }
 
     public boolean isAvailable() {
@@ -459,9 +465,13 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public boolean isExecutable(int starter_id) throws RemoteException {
+    public boolean isExecutable(Task task) throws RemoteException {
         for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
-            if (!n.getValue().isAvailable() && starter_id != n.getKey()) {
+            if (!n.getValue().isAvailable() && task.getStarter() != n.getKey()) {
+                System.err.println(n.getKey());
+                System.err.println("starter "+task.getStarter());
+                System.err.println(task.getStarter()!=n.getKey());
+                System.err.println(!n.getValue().isAvailable());
                 System.err.println("Not executable because "+n.getKey() + " is working on something....");
                 return false;
             }
@@ -573,14 +583,15 @@ public class NodeImpl implements Node, Runnable {
         return new Pair<Integer, Node>(leader_id, leader);
     }
 
-    private void executeQueue() throws RemoteException {
+    @Override
+    public void executeQueue() throws RemoteException {
         if (isLeader) {
-            waitCustom(2);
+            //waitCustom(2);
             printQueue();
-            System.out.println("is executable:"+isExecutable(id));
             if (!taskQueue.isEmpty()) {
                 System.out.println("executing task from queue (" + taskQueue.size() + ")\n");
-                executeTask(taskQueue.remove(0));
+                System.out.println("is executable "+taskQueue.get(0));
+                executeTask(taskQueue.remove(0)); // tady to zavola ten execute
             }
         }
     }

@@ -7,9 +7,15 @@ public class Increase extends Task {
         super(integer,starter_id);
     }
 
+
+
     @Override
     public void execute(NodeImpl node) {
         super.execute(node);
         node.variable += integer;
+    }
+    @Override
+    public String toString(){
+        return this.getClass() + ", created by "+ starter_id + " " + super.starter_id;
     }
 }

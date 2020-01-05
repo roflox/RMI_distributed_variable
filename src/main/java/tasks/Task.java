@@ -7,9 +7,10 @@ import java.io.Serializable;
 public abstract class Task implements Serializable {
 
     int integer;
-    int starter_id;
+    protected int starter_id;
 
     public Task(int starter_id) {
+        this.starter_id = starter_id;
     }
 
     public Task(int integer,int starter_id) {

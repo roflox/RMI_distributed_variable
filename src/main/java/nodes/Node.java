@@ -84,7 +84,7 @@ public interface Node extends Remote {
 
     boolean isAvailable() throws RemoteException;
 
-    boolean isExecutable(int starter_id) throws RemoteException;
+    boolean isExecutable(Task task) throws RemoteException;
 
     boolean isLeader() throws RemoteException;
 
@@ -93,4 +93,6 @@ public interface Node extends Remote {
     boolean addTaskToQueue(Task t) throws RemoteException;
 
     Pair<Integer, Node> getLeader() throws RemoteException;
+
+    void executeQueue() throws RemoteException;
 }
