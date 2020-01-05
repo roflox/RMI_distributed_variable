@@ -15,7 +15,6 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.Set;
 
-
 public class NodeImpl implements Node, Runnable {
 
     private static boolean debug = false;
@@ -34,12 +33,10 @@ public class NodeImpl implements Node, Runnable {
     boolean isLeader = false;
     ArrayList<Pair<Integer, Task>> taskQueue;
 
-
     public NodeImpl(String name, Registry registry, int objectPort) {
         this.name = name;
         bindNode(objectPort, registry);
     }
-
 
     /**
      * @param args nastaveno jako konzolová aplikace, která přijme options
@@ -203,7 +200,6 @@ public class NodeImpl implements Node, Runnable {
         this.right = right.getValue();
         this.right_id = right.getKey();
     }
-
 
     @Override
     public synchronized void setLeader(Pair<Integer, Node> leader) {
@@ -382,16 +378,18 @@ public class NodeImpl implements Node, Runnable {
         if (isLeader && right_id != id) {
             right.election();
         }
-        //TODO odevzdat práci počkat na ukončení atd.
-        System.out.println(String.format("%s is disconnecting.", name));
         if (isLeader) {
-            System.out.println("Newly elected leader is: " + right.getLeader().getKey());
+            var newLeader = right.getLeader();
+            System.out.println("Newly elected leader is: " + newLeader.getKey());
         }
+        System.out.println(String.format("%s is disconnecting.", name));
+
         System.exit(1);
     }
 
     @Override
     public void ping() {
+
 
     }
 
@@ -422,18 +420,14 @@ public class NodeImpl implements Node, Runnable {
         if (debug)
             waitSec();
         try {
-
-//            System.out.println("is executable: " + leader.isExecutable());
             if (!isLeader && starter_id != id) {
                 working = true;
                 waitSec();
                 task.execute(this);
             } else if (leader.isExecutable(starter_id)) {
                 working = true;
-//                System.out.println("isLeader: " + isLeader);
                 if (isLeader) {
                     for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
-//                        System.out.println("isStarter: " + (starter_id == n.getKey()));
                         if (starter_id != n.getKey() && !n.getValue().isLeader()) {
                             if (debug)
                                 waitSec();
@@ -459,7 +453,6 @@ public class NodeImpl implements Node, Runnable {
         working = false;
         executeQueue();
     }
-
 
     public boolean isAvailable() {
         return !working;
@@ -510,22 +503,18 @@ public class NodeImpl implements Node, Runnable {
                     case "add":
                     case "a":
                         task = new Increase(1);
-//                        executeTask(new Increase(1),this.id);
                         break;
                     case "subtract":
                     case "s":
                         task = new Decrease(1);
-//                        executeTask(new Decrease(1),this.id);
                         break;
                     case "wipe":
                     case "w":
                         task = new Wipe();
-//                        executeTask(new Wipe(),id);
                         break;
                     case "random":
                     case "r":
                         task = new tasks.Random();
-//                        executeTask(new tasks.Random(),id);
                         break;
                     case "debug":
                     case "d":
@@ -591,7 +580,6 @@ public class NodeImpl implements Node, Runnable {
             }
         }
     }
-
 
     private void waitSec() {
         try {
