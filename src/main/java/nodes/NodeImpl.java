@@ -583,7 +583,7 @@ public class NodeImpl implements Node, Runnable {
         return new Pair<Integer, Node>(leader_id, leader);
     }
 
-    public void executeQueue() throws RemoteException {
+    public void executeQueue() throws RemoteException { // tady nastane zacykleni, a
         if (isLeader) {
             if(taskQueue.size()!=0) {
                 logger.debug("Gonna execute queue");
