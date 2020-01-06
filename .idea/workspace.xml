@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fb126565-4587-42e0-a95a-607aa9c566a1" name="Default Changelist" comment="upraveny soubory pro IDE">
+    <list default="true" id="fb126565-4587-42e0-a95a-607aa9c566a1" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/Node1.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/nodes/Client.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/nodes/Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/nodes/Node.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/nodes/NodeImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/nodes/NodeImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/log4j.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/log4j2.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tasks/Increase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tasks/Increase.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,18 +100,10 @@
       <recent name="C:\School\DSV\RMI_distributed_variable\src" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Node1">
+  <component name="RunManager" selected="Compound.Bulk">
     <configuration name="Empty Node" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="nodes.NodeImpl" />
       <module name="RMI_distributed_variable" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Node1" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="nodes.NodeImpl" />
-      <module name="RMI_distributed_variable" />
-      <option name="PROGRAM_PARAMETERS" value="--name Node1 -p 50000 -d -r 1099 --debug" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -148,20 +140,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="CompoundRunConfigurationType">
+      <toRun name="Node2" type="Application" />
+      <toRun name="Node3" type="Application" />
+      <toRun name="Node4" type="Application" />
+      <toRun name="Node5" type="Application" />
+      <method v="2" />
+    </configuration>
     <list>
+      <item itemvalue="Application.Node1" />
       <item itemvalue="Application.Node2" />
-      <item itemvalue="Application.Node5" />
       <item itemvalue="Application.Node3" />
       <item itemvalue="Application.Node4" />
+      <item itemvalue="Application.Node5" />
       <item itemvalue="Application.Empty Node" />
-      <item itemvalue="Application.Node1" />
       <item itemvalue="Compound.Bulk" />
     </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Application.Node1" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
@@ -208,7 +202,8 @@
       <workItem from="1578186526714" duration="1697000" />
       <workItem from="1578188388180" duration="749000" />
       <workItem from="1578233257156" duration="5776000" />
-      <workItem from="1578250578981" duration="5903000" />
+      <workItem from="1578250578981" duration="6090000" />
+      <workItem from="1578347768169" duration="4418000" />
     </task>
     <task id="LOCAL-00001" summary="fungujici vytvorene spojeni mezi dvemi nody">
       <created>1575557603286</created>
@@ -266,7 +261,14 @@
       <option name="project" value="LOCAL" />
       <updated>1578176136155</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="pridani loggeru, potrebuje jeste dodelat">
+      <created>1578269203972</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1578269203972</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -280,7 +282,8 @@
     <MESSAGE value="oprava implementace, nyní RMI Registry běží na každém nodu" />
     <MESSAGE value="nějaký úpravy - ??" />
     <MESSAGE value="upraveny soubory pro IDE" />
-    <option name="LAST_COMMIT_MESSAGE" value="upraveny soubory pro IDE" />
+    <MESSAGE value="pridani loggeru, potrebuje jeste dodelat" />
+    <option name="LAST_COMMIT_MESSAGE" value="pridani loggeru, potrebuje jeste dodelat" />
   </component>
   <component name="WindowStateProjectService">
     <state x="677" y="178" key="#Node" timestamp="1575499247090">
@@ -295,11 +298,11 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1032" y="181" key="#Project_Structure/0.0.1920.1040@0.0.1920.1040" timestamp="1577121897879" />
-    <state x="508" y="89" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1578268523088">
+    <state x="508" y="89" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1578352025079">
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
     <state x="470" y="61" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1577026990615" />
-    <state x="508" y="89" key="#com.intellij.execution.impl.EditConfigurationsDialog/50.27.1870.1053@50.27.1870.1053" timestamp="1578268523088" />
+    <state x="508" y="89" key="#com.intellij.execution.impl.EditConfigurationsDialog/50.27.1870.1053@50.27.1870.1053" timestamp="1578352025079" />
     <state x="795" y="265" width="374" height="584" key="#com.intellij.ide.util.MemberChooser" timestamp="1578233834476">
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
@@ -334,11 +337,11 @@
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
     <state x="722" y="408" width="515" height="298" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/50.27.1870.1053@50.27.1870.1053" timestamp="1578188955295" />
-    <state x="368" y="144" width="945" height="816" key="CommitChangelistDialog2" timestamp="1578176185499">
+    <state x="368" y="144" width="945" height="816" key="CommitChangelistDialog2" timestamp="1578269203814">
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
     <state x="327" y="116" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1576349655314" />
-    <state x="368" y="144" width="945" height="816" key="CommitChangelistDialog2/50.27.1870.1053@50.27.1870.1053" timestamp="1578176185499" />
+    <state x="368" y="144" width="945" height="816" key="CommitChangelistDialog2/50.27.1870.1053@50.27.1870.1053" timestamp="1578269203814" />
     <state x="876" y="298" key="DetectedRootsChooserDialog" timestamp="1575474370452">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -347,26 +350,26 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="902" y="337" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1576613607448" />
-    <state width="1824" height="276" key="GridCell.Tab.0.bottom" timestamp="1578269177384">
+    <state width="1824" height="269" key="GridCell.Tab.0.bottom" timestamp="1578352178847">
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
     <state width="1877" height="280" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1577190323106" />
-    <state width="1824" height="276" key="GridCell.Tab.0.bottom/50.27.1870.1053@50.27.1870.1053" timestamp="1578269177384" />
-    <state width="1824" height="276" key="GridCell.Tab.0.center" timestamp="1578269177384">
+    <state width="1824" height="269" key="GridCell.Tab.0.bottom/50.27.1870.1053@50.27.1870.1053" timestamp="1578352178847" />
+    <state width="1824" height="269" key="GridCell.Tab.0.center" timestamp="1578352178846">
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
     <state width="1877" height="280" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1577190323106" />
-    <state width="1824" height="276" key="GridCell.Tab.0.center/50.27.1870.1053@50.27.1870.1053" timestamp="1578269177384" />
-    <state width="1824" height="276" key="GridCell.Tab.0.left" timestamp="1578269177384">
+    <state width="1824" height="269" key="GridCell.Tab.0.center/50.27.1870.1053@50.27.1870.1053" timestamp="1578352178846" />
+    <state width="1824" height="269" key="GridCell.Tab.0.left" timestamp="1578352178840">
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
     <state width="1877" height="280" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1577190323106" />
-    <state width="1824" height="276" key="GridCell.Tab.0.left/50.27.1870.1053@50.27.1870.1053" timestamp="1578269177384" />
-    <state width="1824" height="276" key="GridCell.Tab.0.right" timestamp="1578269177384">
+    <state width="1824" height="269" key="GridCell.Tab.0.left/50.27.1870.1053@50.27.1870.1053" timestamp="1578352178840" />
+    <state width="1824" height="269" key="GridCell.Tab.0.right" timestamp="1578352178847">
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
     <state width="1877" height="280" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1577190323106" />
-    <state width="1824" height="276" key="GridCell.Tab.0.right/50.27.1870.1053@50.27.1870.1053" timestamp="1578269177384" />
+    <state width="1824" height="269" key="GridCell.Tab.0.right/50.27.1870.1053@50.27.1870.1053" timestamp="1578352178847" />
     <state width="1824" height="340" key="GridCell.Tab.1.bottom" timestamp="1578233559479">
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
@@ -404,11 +407,11 @@
     </state>
     <state x="602" y="157" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1577030770333" />
     <state x="636" y="186" width="1024" height="852" key="SettingsEditor/50.27.1870.1053@50.27.1870.1053" timestamp="1578164191162" />
-    <state x="349" y="286" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1578176143421">
+    <state x="349" y="286" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1578269207524">
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
     <state x="307" y="256" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1576349657930" />
-    <state x="349" y="286" width="800" height="535" key="Vcs.Push.Dialog.v2/50.27.1870.1053@50.27.1870.1053" timestamp="1578176143421" />
+    <state x="349" y="286" width="800" height="535" key="Vcs.Push.Dialog.v2/50.27.1870.1053@50.27.1870.1053" timestamp="1578269207524" />
     <state x="826" y="476" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1575474292094">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -421,6 +424,10 @@
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
     <state x="757" y="473" width="455" height="167" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/50.27.1870.1053@50.27.1870.1053" timestamp="1578266143559" />
+    <state x="935" y="169" key="com.intellij.tools.ToolSelectDialog.dimensionServiceKey" timestamp="1578351854625">
+      <screen x="50" y="27" width="1870" height="1053" />
+    </state>
+    <state x="935" y="169" key="com.intellij.tools.ToolSelectDialog.dimensionServiceKey/50.27.1870.1053@50.27.1870.1053" timestamp="1578351854625" />
     <state x="524" y="292" width="912" height="583" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1578233555669">
       <screen x="50" y="27" width="1870" height="1053" />
     </state>

@@ -16,6 +16,6 @@ public class Increase extends Task {
     }
     @Override
     public String toString(){
-        return this.getClass() + ", created by "+ starter_id + " " + super.starter_id;
+        return this.getClass() + ", created by "+ starter_id;
     }
 }

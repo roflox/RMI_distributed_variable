@@ -75,6 +75,7 @@ public class NodeImpl implements Node, Runnable {
                 logger.info(String.format("%s:%s", key, arguments.get(key)));
             }
         }
+        logger.debug("Running in debug mode.");
         // create own registry
         Registry registry = null;
         try {
@@ -175,11 +176,12 @@ public class NodeImpl implements Node, Runnable {
         right = node;
         right_id = node.getId();
         node.executeTask(new tasks.Set(variable, id));
-        if (debug) {
-            node.printInfo();
-            node.getRight().getValue().printInfo();
-            if (!node.getRight().equals(node.getLeft())) node.getLeft().getValue().printInfo();
-        }
+        logger.info(String.format("%s is connected.", name));
+//        if (debug) {
+//            node.printInfo();
+//            node.getRight().getValue().printInfo();
+//            if (!node.getRight().equals(node.getLeft())) node.getLeft().getValue().printInfo();
+//        }
     }
 
     @Override
@@ -223,8 +225,8 @@ public class NodeImpl implements Node, Runnable {
         StringBuilder sb = new StringBuilder();
         boolean broken = false;
         boolean aliveLeader = true;
-        sb.append("node_id: ").append(id);
-        logger.info(sb.toString());
+//        sb.append("node_id: ").append(id);
+//        logger.info(sb.toString());
         sb = new StringBuilder();
         if (this.left != null) {
             try {
@@ -258,8 +260,6 @@ public class NodeImpl implements Node, Runnable {
                             broken = true;
                         }
                     }
-                    logger.info(sb.toString());
-                    logger.info("Number of tasks in queue:" + taskQueue.size());
                 } else {
                     sb.append("Leader: ")
                             .append(this.leader.getName())
@@ -273,6 +273,8 @@ public class NodeImpl implements Node, Runnable {
         }
         logger.info(sb.toString());
         logger.info("Variable: " + variable);
+        if(isLeader)
+            printQueue();
         if (broken) {
             this.repairRing(aliveLeader);
         }
@@ -423,36 +425,32 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public synchronized void executeTask(Task task) throws RemoteException {
-        if (task == null)
+        if (task == null) {
             return;
+        }
         logger.info(String.format("executing task: %s initiated by %s", task.getClass().toString(), task.getStarter()));
         if (debug)
             waitSec();
         try {
 
             if (!isLeader && task.getStarter() != id) { // toto ani nevim proc tu je :D
-                logger.info("vetev A + working");
                 working = true;
                 waitSec();
                 task.execute(this);
             } else if (leader.isExecutable(task)) { // pro leadera
-                logger.info("vetev B + working");
                 working = true;
                 if (isLeader) { // toto rika leaderovi ze ma executnout ty tasky na "poddanych" nebo jak je nazvat
                     for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
                         if (task.getStarter() != n.getKey() && !n.getValue().isLeader()) { //toto je tu aby se to nezacyklilo, aby si leader nedal znova za ukol ten task, a nebo aby to nedal za ukol starterovi
                             n.getValue().executeTask(task);
-                        }// nevim co dal...
+                        }
                     }
-                    logger.error("Executed on all other nodes.");
                 } else { // pro startera
-
                     this.leader.executeTask(task);
                 }
                 task.execute(this); // jo jasne, toto je to pro leadera a pro startera
             } else {
                 leader.addTaskToQueue(task); // tady to dava do fronty
-                return;
             }
         } catch (RemoteException e) {
             if (isLeader) {
@@ -463,8 +461,7 @@ public class NodeImpl implements Node, Runnable {
             this.leader.executeTask(new tasks.Set(variable, id));
         }
         working = false;
-        // TODO přidat execute tasku co jsou ve fronte, ps toto podtim nefunguje
-//        leader.executeQueue(); // klikni na to s C
+        executeQueue();
     }
 
     public boolean isAvailable() {
@@ -475,7 +472,7 @@ public class NodeImpl implements Node, Runnable {
     public boolean isExecutable(Task task) throws RemoteException {
         for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
             if (!n.getValue().isAvailable() && task.getStarter() != n.getKey()) {
-                logger.error("Not executable because " + n.getKey() + " is working on something....");
+                logger.warn("Not executable because " + n.getKey() + " is working on something else.");
                 return false;
             }
         }
@@ -570,7 +567,7 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public boolean addTaskToQueue(Task task) throws RemoteException {
-        logger.error(String.format("Queue.add %s", task));
+        logger.debug(String.format("Queue.add %s", task));
         printQueue();
         if (!taskQueue.contains(task)) {
             taskQueue.add(task);
@@ -586,15 +583,15 @@ public class NodeImpl implements Node, Runnable {
         return new Pair<Integer, Node>(leader_id, leader);
     }
 
-    @Override
     public void executeQueue() throws RemoteException {
         if (isLeader) {
-            //waitCustom(2);
-            printQueue();
-            if (!taskQueue.isEmpty()) {
-                logger.info("executing task from queue (" + taskQueue.size() + ")\n");
-                logger.info("is executable " + isExecutable(taskQueue.get(0)));
-                executeTask(taskQueue.remove(0)); // tady to zavola ten execute
+            if(taskQueue.size()!=0) {
+                logger.debug("Gonna execute queue");
+                Task task = taskQueue.remove(0);
+                while (!isExecutable(task)) {
+                    waitCustom(1);
+                }
+                executeTask(task);
             }
         }
     }

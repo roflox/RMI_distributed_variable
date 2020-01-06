@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Node1" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="nodes.NodeImpl" />
+    <module name="RMI_distributed_variable" />
+    <option name="PROGRAM_PARAMETERS" value="--name Node1 -p 50000 -d -r 1099 --debug" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -93,6 +93,4 @@ public interface Node extends Remote {
     boolean addTaskToQueue(Task t) throws RemoteException;
 
     Pair<Integer, Node> getLeader() throws RemoteException;
-
-    void executeQueue() throws RemoteException;
 }
