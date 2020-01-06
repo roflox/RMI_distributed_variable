@@ -1,8 +1,12 @@
 package nodes;
 
 import javafx.util.Pair;
-import tasks.*;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 import tasks.Random;
+import tasks.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,13 +16,13 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.*;
 import java.util.Set;
+import java.util.*;
 
 public class NodeImpl implements Node, Runnable {
 
     private static boolean debug = false;
-    //    private static final Logger LOG = LogManager.getLogger(nodes.NodeImpl.class);
+    private static Logger logger = LogManager.getLogger(NodeImpl.class.getName());
     Node right;
     int right_id;
     Node left;
@@ -49,7 +53,6 @@ public class NodeImpl implements Node, Runnable {
      *             -d --debug spuštění debug módu
      */
     public static void main(String[] args) {
-
         Map<String, Object> arguments = ConsoleArgumentParser.parse(args);
         // getting arguments from map
         String targetRegistryAddress = (String) arguments.get("targetRegistryAddress");
@@ -61,13 +64,15 @@ public class NodeImpl implements Node, Runnable {
         debug = (boolean) arguments.get("debug");
         boolean development = (boolean) arguments.get("development");
         String hostname = (String) arguments.get("hostname");
-
+        if (debug) {
+            Configurator.setRootLevel(Level.DEBUG);
+        }
         // Toto tu je, aby se dalo vzdáleně připojovat na nody.
         System.setProperty("java.rmi.server.hostname", hostname);
 
         if (development) {
             for (String key : arguments.keySet()) {
-                System.out.println(String.format("%s:%s", key, arguments.get(key)));
+                logger.info(String.format("%s:%s", key, arguments.get(key)));
             }
         }
         // create own registry
@@ -75,17 +80,17 @@ public class NodeImpl implements Node, Runnable {
         try {
             registry = LocateRegistry.createRegistry(registryPort);
         } catch (RemoteException e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
             System.exit(1);
         }
         NodeImpl nodeImpl = new NodeImpl(nodeName, registry, port);
-        System.out.println(String.format("nodes.Node is using name: %s, port: %d,registry " +
+        logger.info(String.format("nodes.Node is using name: %s, port: %d,registry " +
                 "port: :%d", nodeName, port, registryPort));
 
         if (target == null) {
             nodeImpl.becomeLeader();
         } else {
-            System.out.println(String.format("Trying to connect to %s with registry " +
+            logger.info(String.format("Trying to connect to %s with registry " +
                     "on %s:%d", target, targetRegistryAddress, targetRegistryPort));
             nodeImpl.connectToAnotherNode(target, targetRegistryAddress, targetRegistryPort);
         }
@@ -102,7 +107,7 @@ public class NodeImpl implements Node, Runnable {
             Node stub = (Node) UnicastRemoteObject.exportObject(this, objectPort);
             registry.rebind(name, stub);
         } catch (RemoteException e) {
-            System.err.println("Port that you are trying to use is probably not available. Try again later.");
+            logger.error("Port that you are trying to use is probably not available. Try again later.");
             System.exit(1);
         }
     }
@@ -119,7 +124,7 @@ public class NodeImpl implements Node, Runnable {
             Node node = (Node) registry.lookup(target);
             node.join(this.name, this);
         } catch (RemoteException | NotBoundException e) {
-            System.err.println(String.format("Could not establish connection with %s:%s. Try it again or change " +
+            logger.error(String.format("Could not establish connection with %s:%s. Try it again or change " +
                     "target to which you are trying to connect.", targetRegistryAddress, targetRegistryPort));
             System.exit(1);
         }
@@ -135,7 +140,7 @@ public class NodeImpl implements Node, Runnable {
                 id = 1;
                 setLeft(new Pair<>(id, this));
                 setRight(new Pair<>(id, this));
-                setLeader(new Pair<>(id,this));
+                setLeader(new Pair<>(id, this));
                 Task rand = new Random(id);
                 rand.execute(this);
                 allNodes.put(id, this);
@@ -147,7 +152,7 @@ public class NodeImpl implements Node, Runnable {
                         n.setLeader(new Pair<>(id, this));
                     }
                 } catch (RemoteException e) {
-                    System.err.println((e.getMessage()));
+                    logger.error((e.getMessage()));
                 }
             }
         }
@@ -161,7 +166,7 @@ public class NodeImpl implements Node, Runnable {
      */
     @Override
     public synchronized void join(String name, Node node) throws RemoteException {
-        System.out.println(String.format("%s is connecting.", name));
+        logger.info(String.format("%s is connecting.", name));
         node.setLeader(new Pair<>(leader_id, leader));
         leader.addNode(node);
         node.setRight(new Pair<>(right_id, right));
@@ -169,7 +174,6 @@ public class NodeImpl implements Node, Runnable {
         node.setLeft(new Pair<>(id, this));
         right = node;
         right_id = node.getId();
-//        node.setVariable(this.variable);
         node.executeTask(new tasks.Set(variable, id));
         if (debug) {
             node.printInfo();
@@ -216,10 +220,12 @@ public class NodeImpl implements Node, Runnable {
      */
     @Override
     public void printInfo() throws RemoteException {
-        StringBuilder sb = new StringBuilder("\n");
+        StringBuilder sb = new StringBuilder();
         boolean broken = false;
         boolean aliveLeader = true;
-        sb.append("node_id").append(id).append("\n");
+        sb.append("node_id: ").append(id);
+        logger.info(sb.toString());
+        sb = new StringBuilder();
         if (this.left != null) {
             try {
                 sb.append("Left: ").append(this.left.getName()).append(" id: ").append(this.left_id).append(", ");
@@ -231,17 +237,19 @@ public class NodeImpl implements Node, Runnable {
         }
         if (this.right != null) {
             try {
-                sb.append("Right: ").append(this.right.getName()).append(" id: ").append(this.right_id).append("\n");
+                sb.append("Right: ").append(this.right.getName()).append(" id: ").append(this.right_id);
             } catch (RemoteException e) {
-                sb.append("Right node is dead\n");
+                sb.append("Right node is dead");
                 broken = true;
 //                sb.append("New Right node is:").append(this.right.getName()).append(", ");
             }
         }
+        logger.info(sb.toString());
+        sb = new StringBuilder();
         if (this.leader != null) {
             try {
                 if (this.isLeader) {
-                    sb.append("This node is leader, all nodes: ");
+                    logger.info("This node is leader, all nodes:");
                     for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
                         try {
                             sb.append(n.getValue().getName()).append(", id:").append(n.getKey()).append("; ");
@@ -250,21 +258,21 @@ public class NodeImpl implements Node, Runnable {
                             broken = true;
                         }
                     }
-                    sb.append("\nNumber of tasks in queue:").append(taskQueue.size()).append("\n");
+                    logger.info(sb.toString());
+                    logger.info("Number of tasks in queue:" + taskQueue.size());
                 } else {
                     sb.append("Leader: ")
                             .append(this.leader.getName())
                             .append(" id: ")
-                            .append(this.leader_id).append("\n");
+                            .append(this.leader_id);
                 }
             } catch (RemoteException e) {
                 sb.append("Leader node is dead\n");
                 aliveLeader = false;
             }
         }
-        sb.append("Variable: ").append(variable).append("\n");
-        System.out.println(sb.toString());
-        printQueue();
+        logger.info(sb.toString());
+        logger.info("Variable: " + variable);
         if (broken) {
             this.repairRing(aliveLeader);
         }
@@ -313,7 +321,7 @@ public class NodeImpl implements Node, Runnable {
     public Node look(String starter, Path where) {
         if (starter != null) {
             if (starter.equals(this.name)) {
-                System.out.println("Ring is healthy.");
+                logger.info("Ring is healthy.");
                 return this;
             }
         }
@@ -351,13 +359,13 @@ public class NodeImpl implements Node, Runnable {
     public void repairRing(boolean aliveLeader) throws RemoteException {
         Node lookRight = this.look(null, Path.right);
         Node lookLeft = this.look(null, Path.left);
-        System.err.println("Topology is broken. Repair process is started. Alive leader:" + aliveLeader);
+        logger.error("Topology is broken. Repair process is started. Alive leader:" + aliveLeader);
         if (!lookLeft.equals(lookRight) || !isHealthy()) {
             lookLeft.setLeft((new Pair<>(lookRight.getId(), lookRight)));
             lookRight.setRight((new Pair<>(lookLeft.getId(), lookLeft)));
 
         }
-        System.err.println("Topology should be repaired. Gonna start election: " + !aliveLeader);
+        logger.error("Topology should be repaired. Gonna start election: " + !aliveLeader);
         if (aliveLeader)
             this.leader.gatherNodes();
         else
@@ -381,9 +389,9 @@ public class NodeImpl implements Node, Runnable {
         }
         if (isLeader) {
             var newLeader = right.getLeader();
-            System.out.println("Newly elected leader is: " + newLeader.getKey());
+            logger.info("Newly elected leader is: " + newLeader.getKey());
         }
-        System.out.println(String.format("%s is disconnecting.", name));
+        logger.info(String.format("%s is disconnecting.", name));
 
         System.exit(1);
     }
@@ -417,18 +425,18 @@ public class NodeImpl implements Node, Runnable {
     public synchronized void executeTask(Task task) throws RemoteException {
         if (task == null)
             return;
-        System.out.println(String.format("executing task: %s initiated by %s", task.getClass().toString(), task.getStarter()));
+        logger.info(String.format("executing task: %s initiated by %s", task.getClass().toString(), task.getStarter()));
         if (debug)
             waitSec();
         try {
 
             if (!isLeader && task.getStarter() != id) { // toto ani nevim proc tu je :D
-                System.out.println("vetev A + working");
+                logger.info("vetev A + working");
                 working = true;
                 waitSec();
                 task.execute(this);
             } else if (leader.isExecutable(task)) { // pro leadera
-                System.out.println("vetev B + working");
+                logger.info("vetev B + working");
                 working = true;
                 if (isLeader) { // toto rika leaderovi ze ma executnout ty tasky na "poddanych" nebo jak je nazvat
                     for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
@@ -436,7 +444,7 @@ public class NodeImpl implements Node, Runnable {
                             n.getValue().executeTask(task);
                         }// nevim co dal...
                     }
-                    System.err.println("Executed on all other nodes.");
+                    logger.error("Executed on all other nodes.");
                 } else { // pro startera
 
                     this.leader.executeTask(task);
@@ -454,10 +462,9 @@ public class NodeImpl implements Node, Runnable {
             }
             this.leader.executeTask(new tasks.Set(variable, id));
         }
-        System.out.println(id+" "+working);
         working = false;
-        System.out.println(id+" "+working);
-        leader.executeQueue(); // klikni na to s C
+        // TODO přidat execute tasku co jsou ve fronte, ps toto podtim nefunguje
+//        leader.executeQueue(); // klikni na to s C
     }
 
     public boolean isAvailable() {
@@ -468,11 +475,7 @@ public class NodeImpl implements Node, Runnable {
     public boolean isExecutable(Task task) throws RemoteException {
         for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
             if (!n.getValue().isAvailable() && task.getStarter() != n.getKey()) {
-                System.err.println(n.getKey());
-                System.err.println("starter "+task.getStarter());
-                System.err.println(task.getStarter()!=n.getKey());
-                System.err.println(!n.getValue().isAvailable());
-                System.err.println("Not executable because "+n.getKey() + " is working on something....");
+                logger.error("Not executable because " + n.getKey() + " is working on something....");
                 return false;
             }
         }
@@ -480,18 +483,18 @@ public class NodeImpl implements Node, Runnable {
     }
 
     private void printHelp() {
-        System.out.println("Available commands are:");
-        System.out.println("\t\t\ti or info - to print info");
-        System.out.println("\t\t\tq or quit - to gently shutdown node");
-        System.out.println("\t\t\ta or add - adding 1 to current value of shared variable");
-        System.out.println("\t\t\ts or subtract - subtracting 1 from current value of shared variable");
-        System.out.println("\t\t\tw or wipe - for setting current value of variable to 0");
-        System.out.println("\t\t\tr or random - generate new random variable");
+        logger.info("Available commands are:");
+        logger.info("\t\t\ti or info - to print info");
+        logger.info("\t\t\tq or quit - to gently shutdown node");
+        logger.info("\t\t\ta or add - adding 1 to current value of shared variable");
+        logger.info("\t\t\ts or subtract - subtracting 1 from current value of shared variable");
+        logger.info("\t\t\tw or wipe - for setting current value of variable to 0");
+        logger.info("\t\t\tr or random - generate new random variable");
     }
 
     @Override
     public void run() {
-        System.out.println("To see all commands, just hit enter.");
+        logger.info("To see all commands, just hit enter.");
         BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
         String input;
         while (true) {
@@ -536,12 +539,12 @@ public class NodeImpl implements Node, Runnable {
                 }
                 this.executeTask(task);
             } catch (RemoteException e) {
-                System.err.println("Topology is damaged.");
+                logger.error("Topology is damaged.");
                 e.printStackTrace();
                 try {
                     this.repairRing(false);
                 } catch (RemoteException fe) {
-                    System.err.println("Fatal error, ring cannot be repaired");
+                    logger.error("Fatal error, ring cannot be repaired");
                     if (debug)
                         fe.printStackTrace();
                 }
@@ -567,13 +570,13 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public boolean addTaskToQueue(Task task) throws RemoteException {
-        System.err.println(String.format("adding %s initiated by %s to the queue", task.getClass().toString(), task.getStarter()));
+        logger.error(String.format("Queue.add %s", task));
         printQueue();
         if (!taskQueue.contains(task)) {
             taskQueue.add(task);
             return true;
         } else {
-            System.err.println("Same task is already in the queue!");
+            logger.error("Same task is already in the queue!");
             return false;
         }
     }
@@ -589,8 +592,8 @@ public class NodeImpl implements Node, Runnable {
             //waitCustom(2);
             printQueue();
             if (!taskQueue.isEmpty()) {
-                System.out.println("executing task from queue (" + taskQueue.size() + ")\n");
-                System.out.println("is executable "+taskQueue.get(0));
+                logger.info("executing task from queue (" + taskQueue.size() + ")\n");
+                logger.info("is executable " + isExecutable(taskQueue.get(0)));
                 executeTask(taskQueue.remove(0)); // tady to zavola ten execute
             }
         }
@@ -600,7 +603,7 @@ public class NodeImpl implements Node, Runnable {
         try {
             wait(500);
         } catch (Exception e) {
-            System.err.println("Cannot wait!");
+            logger.error("Cannot wait!");
         }
     }
 
@@ -608,7 +611,7 @@ public class NodeImpl implements Node, Runnable {
         try {
             wait(seconds * 1000);
         } catch (Exception e) {
-            System.err.println("Cannot wait!");
+            logger.error("Cannot wait!");
         }
     }
 
@@ -619,22 +622,8 @@ public class NodeImpl implements Node, Runnable {
                 for (Task queued : taskQueue) {
                     sb.append(queued).append(", ");
                 }
-                System.out.println("\nQueued tasks:\n" + sb.toString());
+                logger.debug("Queued tasks:\n" + sb.toString());
             }
-        }
-    }
-
-    public void clearScreen() {
-        try {
-            final String os = System.getProperty("os.name");
-
-            if (os.contains("Windows")) {
-                Runtime.getRuntime().exec("cls");
-            } else {
-                Runtime.getRuntime().exec("clear");
-            }
-        }catch (Exception e){
-            System.err.println("Cannot clean console.");
         }
     }
 }
