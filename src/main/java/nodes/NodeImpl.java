@@ -46,14 +46,17 @@ public class NodeImpl implements Node, Runnable {
 
     /**
      * @param args nastaveno jako konzolová aplikace, která přijme options
-     *             -t --target cílový node, ke kterému se má nově spuštěný node připojit
-     *             -n --name jméno nově vzniklého nodu
-     *             -rp --registryPort port kde běží RMI registry
-     *             -rh --registryHost adresa kde běží RMI registry
-     *             -p --port port kde bude vystavený Proxy objekt
-     *             -d --debug spuštění debug módu
+     *         -n --name                   Name of your node, which will be written into RMI registry. REQUIRED
+     *         -h --hostname                Ip address of current node. It is recommended to be used, remote nodes may not connect.
+     *         -p --port                    Port on which this node will be listening. REQUIRED
+     *         -r --registryPort            Port on which your RMI registry will be. REQUIRED
+     *         -t --target                  Target node name.
+     *         -A --targetRegistryAddress   Address of target's node RMI registry. If not set using localhost.
+     *         -P --targetRegistryPort      Port of target's node RMI registry. REQUIRED when -t --target is present.
+     *         -d --debug                   Option for debug mode.
+     *         -w --waitTime                For how long should node wait if not connected instantly.
      */
-    public static void main(String[] args) throws InterruptedException{
+    public static void main(String[] args) throws InterruptedException {
         Map<String, Object> arguments = ConsoleArgumentParser.parse(args);
         // getting arguments from map
         String targetRegistryAddress = (String) arguments.get("targetRegistryAddress");
@@ -81,19 +84,19 @@ public class NodeImpl implements Node, Runnable {
             System.exit(1);
         }
         NodeImpl nodeImpl = new NodeImpl(nodeName, registry, port);
-        logger.info("{}'s registry running on {}:{}. Node is using port {}.",nodeName,hostname,registryPort,port);
+        logger.info("{}'s registry running on {}:{}. Node is using port {}.", nodeName, hostname, registryPort, port);
 
         if (target == null) {
             nodeImpl.becomeLeader();
         } else {
             logger.info("Trying to connect to {} with registry " +
-                    "on {}:{}.",target,targetRegistryAddress,targetRegistryPort);
+                    "on {}:{}.", target, targetRegistryAddress, targetRegistryPort);
             boolean succes = false;
-            for(int i = 0; i < 5;i++) {
+            for (int i = 0; i < 5; i++) {
                 succes = nodeImpl.connectToAnotherNode(target, targetRegistryAddress, targetRegistryPort);
-                if(succes)
+                if (succes)
                     break;
-                if(i!=4){
+                if (i != 4) {
                     Main m = new Main();
                     synchronized (m) {
                         logger.warn("Could not establish connection, trying again.");
@@ -101,7 +104,7 @@ public class NodeImpl implements Node, Runnable {
                     }
                 }
             }
-            if(!succes){
+            if (!succes) {
                 logger.fatal("Could not establish connection with {}:{}. Try it again or change " +
                         "target to which you are trying to connect.", targetRegistryAddress, targetRegistryPort);
                 System.exit(1);
@@ -284,7 +287,7 @@ public class NodeImpl implements Node, Runnable {
         }
         logger.info(sb.toString());
         logger.info("Variable: " + variable);
-        if(isLeader)
+        if (isLeader)
             printQueue();
         if (broken) {
             this.repairRing(aliveLeader);
@@ -439,18 +442,17 @@ public class NodeImpl implements Node, Runnable {
         if (task == null) {
             return;
         }
-        logger.info("Executing task {}.",task);
-//        if (debug)
-//            waitSec();
+        logger.info("Executing task {}.", task);
         try {
 
             if (!isLeader && task.getStarter() != id) { // toto ani nevim proc tu je :D
                 working = true;
-//                waitSec();
+                waitCustom(2);
                 task.execute(this);
             } else if (leader.isExecutable(task)) { // pro leadera
-                working = true;
+
                 if (isLeader) { // toto rika leaderovi ze ma executnout ty tasky na "poddanych" nebo jak je nazvat
+                    working = true;
                     for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
                         if (task.getStarter() != n.getKey() && !n.getValue().isLeader()) { //toto je tu aby se to nezacyklilo, aby si leader nedal znova za ukol ten task, a nebo aby to nedal za ukol starterovi
                             n.getValue().executeTask(task);
@@ -458,6 +460,7 @@ public class NodeImpl implements Node, Runnable {
                     }
                 } else { // pro startera
                     this.leader.executeTask(task);
+                    working = true;
                 }
                 task.execute(this); // jo jasne, toto je to pro leadera a pro startera
             } else {
@@ -481,7 +484,7 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public boolean isExecutable(Task task) throws RemoteException {
-        logger.debug("Checking if {} is executable.",task);
+        logger.debug("Checking if {} is executable.", task);
         for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
             if (!n.getValue().isAvailable() && task.getStarter() != n.getKey()) {
                 logger.warn("Not executable because " + n.getKey() + " is working on something else.");
@@ -510,43 +513,56 @@ public class NodeImpl implements Node, Runnable {
             try {
                 input = bf.readLine();
                 Task task = null;
-                switch (input) {
-                    case "quit":
-                    case "q":
-                        disconnect();
-                        break;
-                    case "info":
-                    case "i":
-                        printInfo();
-                        break;
-                    case "election":
-                    case "e":
-                        election();
-                        break;
-                    case "add":
-                    case "a":
-                        task = new Increase(1, id);
-                        break;
-                    case "subtract":
-                    case "s":
-                        task = new Decrease(1, id);
-                        break;
-                    case "wipe":
-                    case "w":
-                        task = new Wipe(id);
-                        break;
-                    case "random":
-                    case "r":
-                        task = new tasks.Random(id);
-                        break;
-                    case "debug":
-                    case "d":
-                        executeQueue();
-                        break;
-                    default:
-                        printHelp();
+                String[] commands = input.split("(?!^)");
+                for (String command : commands) {
+                    switch (command) {
+                        case "quit":
+                        case "q":
+                            disconnect();
+                            break;
+                        case "info":
+                        case "i":
+                            printInfo();
+                            break;
+                        case "election":
+                        case "e":
+                            election();
+                            break;
+                        case "add":
+                        case "a":
+                            task = new Increase(1, id);
+                            break;
+                        case "subtract":
+                        case "s":
+                            task = new Decrease(1, id);
+                            break;
+                        case "wipe":
+                        case "w":
+                            task = new Wipe(id);
+                            break;
+                        case "random":
+                        case "r":
+                            task = new tasks.Random(id);
+                            break;
+                        case "debug":
+                        case "d":
+                            executeQueue();
+                            break;
+                        default:
+//                            printHelp();
+                            logger.warn("Command {} is not recognized. Hit enter to display help.", command);
+                    }
+
+                    this.executeTask(task);
                 }
-                this.executeTask(task);
+                Main m = new Main();
+                synchronized (m) {
+                    try {
+                        m.wait(1000);
+                    } catch (Exception e) {
+
+                    }
+                }
             } catch (RemoteException e) {
                 logger.error("Topology is damaged.");
                 e.printStackTrace();
@@ -579,7 +595,7 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public boolean addTaskToQueue(Task task) throws RemoteException {
-        logger.debug("Queued: {}.",task);
+        logger.debug("Queued: {}.", task);
         printQueue();
         if (!taskQueue.contains(task)) {
             taskQueue.add(task);
@@ -597,7 +613,7 @@ public class NodeImpl implements Node, Runnable {
 
     public void executeQueue() throws RemoteException { // tady nastane zacykleni, a
         if (isLeader) {
-            if(taskQueue.size()!=0) {
+            if (taskQueue.size() != 0) {
                 logger.debug("Gonna execute queue");
                 Task task = taskQueue.remove(0);
                 while (!isExecutable(task)) {

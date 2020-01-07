@@ -19,7 +19,7 @@ public class ConsoleArgumentParser {
         createOptions("n", "name", true, "Name of your node, which will be written into RMI registry. REQUIRED", true, options);
         createOptions("h", "hostname", true, "Ip address of current node. It is recommended to be used, remote nodes may not connect.", false, options);
         createOptions("p", "port", true, "Port on which this node will be listening. REQUIRED", true, options);
-        createOptions("r", "registryPort", true, "Port on which this node will be listening.", true, options);
+        createOptions("r", "registryPort", true, "Port on which your RMI registry will be. REQUIRED", true, options);
         createOptions("t", "target", true, "Target node name.", false, options);
         createOptions("A", "targetRegistryAddress", true, "Address of target's node RMI registry. If not set using localhost.", false, options);
         createOptions("P", "targetRegistryPort", true, "Port of target's node RMI registry. REQUIRED when -t --target is present.", false, options);
