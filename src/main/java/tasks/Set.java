@@ -4,7 +4,7 @@ import nodes.NodeImpl;
 
 public class Set extends Task {
     public Set(int integer, int starter_id) {
-        super(integer,starter_id);
+        super(integer,starter_id,"Set");
     }
 
     @Override

@@ -4,7 +4,7 @@ import nodes.NodeImpl;
 
 public class Random extends Task {
     public Random(int starter_id) {
-        super(starter_id);
+        super(starter_id,"Random");
     }
 
     @Override

@@ -4,7 +4,7 @@ import nodes.NodeImpl;
 
 public class Wipe extends Task {
     public Wipe(int starter_id) {
-        super(starter_id);
+        super(starter_id,"Wipe");
     }
 
     @Override

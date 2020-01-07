@@ -4,7 +4,7 @@ import nodes.NodeImpl;
 
 public class Increase extends Task {
     public Increase(int integer, int starter_id) {
-        super(integer,starter_id);
+        super(integer,starter_id,"Increase");
     }
 
 

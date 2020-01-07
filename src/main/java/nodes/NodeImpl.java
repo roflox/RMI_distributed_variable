@@ -70,11 +70,6 @@ public class NodeImpl implements Node, Runnable {
         // Toto tu je, aby se dalo vzdáleně připojovat na nody.
         System.setProperty("java.rmi.server.hostname", hostname);
 
-        if (development) {
-            for (String key : arguments.keySet()) {
-                logger.info(String.format("%s:%s", key, arguments.get(key)));
-            }
-        }
         logger.debug("Running in debug mode.");
         // create own registry
         Registry registry = null;
@@ -85,14 +80,13 @@ public class NodeImpl implements Node, Runnable {
             System.exit(1);
         }
         NodeImpl nodeImpl = new NodeImpl(nodeName, registry, port);
-        logger.info(String.format("nodes.Node is using name: %s, port: %d,registry " +
-                "port: :%d", nodeName, port, registryPort));
+        logger.info("{}'s registry running on {}:{}. Node is using port {}.",nodeName,hostname,registryPort,port);
 
         if (target == null) {
             nodeImpl.becomeLeader();
         } else {
-            logger.info(String.format("Trying to connect to %s with registry " +
-                    "on %s:%d", target, targetRegistryAddress, targetRegistryPort));
+            logger.info("Trying to connect to {} with registry " +
+                    "on {}:{}.",target,targetRegistryAddress,targetRegistryPort);
             nodeImpl.connectToAnotherNode(target, targetRegistryAddress, targetRegistryPort);
         }
         nodeImpl.run();
@@ -428,14 +422,14 @@ public class NodeImpl implements Node, Runnable {
         if (task == null) {
             return;
         }
-        logger.info(String.format("executing task: %s initiated by %s", task.getClass().toString(), task.getStarter()));
-        if (debug)
-            waitSec();
+        logger.info("Executing task {}.",task);
+//        if (debug)
+//            waitSec();
         try {
 
             if (!isLeader && task.getStarter() != id) { // toto ani nevim proc tu je :D
                 working = true;
-                waitSec();
+//                waitSec();
                 task.execute(this);
             } else if (leader.isExecutable(task)) { // pro leadera
                 working = true;
@@ -470,6 +464,7 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public boolean isExecutable(Task task) throws RemoteException {
+        logger.debug("Checking if {} is executable.",task);
         for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
             if (!n.getValue().isAvailable() && task.getStarter() != n.getKey()) {
                 logger.warn("Not executable because " + n.getKey() + " is working on something else.");
@@ -534,6 +529,7 @@ public class NodeImpl implements Node, Runnable {
                     default:
                         printHelp();
                 }
+                waitCustom(2);
                 this.executeTask(task);
             } catch (RemoteException e) {
                 logger.error("Topology is damaged.");
@@ -567,7 +563,7 @@ public class NodeImpl implements Node, Runnable {
 
     @Override
     public boolean addTaskToQueue(Task task) throws RemoteException {
-        logger.debug(String.format("Queue.add %s", task));
+        logger.debug("Queued: {}.",task);
         printQueue();
         if (!taskQueue.contains(task)) {
             taskQueue.add(task);
