@@ -25,7 +25,7 @@ public class ConsoleArgumentParser {
         createOptions("P", "targetRegistryPort", true, "Port of target's node RMI registry. REQUIRED when -t --target is present.", false, options);
         createOptions("d", "debug", false, "Option for debug mode.", false, options);
         createOptions("D", "development", false, "Option for development debugging.", false, options);
-        createOptions("f", "fun", false, "For fun behaviour, only works without debug.", false, options);
+        createOptions("w", "waitTime", true, "For how long should node wait if not connected instantly.", false, options);
 
 
         CommandLineParser parser = new DefaultParser();
@@ -62,14 +62,14 @@ public class ConsoleArgumentParser {
                 map.put("hostname", "127.0.0.1");
             }
         }else {
-            map.put("hostname", cmd.getOptionValue("registryAddress"));
+            map.put("hostname", cmd.getOptionValue("hostname"));
         }
         map.put("nodeName", cmd.getOptionValue("name"));
         map.put("targetRegistryAddress", cmd.getOptionValue("targetRegistryAddress") == null ? "localhost" : cmd.getOptionValue("targetRegistryAddress"));
         map.put("debug", cmd.hasOption("debug"));
         map.put("development", cmd.hasOption("development"));
         map.put("fun", cmd.hasOption("fun"));
-
+        map.put("waitTime", cmd.getOptionValue("waitTime") == null ? 3000 : cmd.getOptionValue("waitTime"));
         try {
             map.put("port", Integer.parseInt(cmd.getOptionValue("port")));
             map.put("registryPort", Integer.parseInt(cmd.getOptionValue("registryPort")));

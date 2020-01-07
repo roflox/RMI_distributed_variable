@@ -1,5 +1,6 @@
 package nodes;
 
+import com.sun.tools.javac.Main;
 import javafx.util.Pair;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -52,7 +53,7 @@ public class NodeImpl implements Node, Runnable {
      *             -p --port port kde bude vystavený Proxy objekt
      *             -d --debug spuštění debug módu
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException{
         Map<String, Object> arguments = ConsoleArgumentParser.parse(args);
         // getting arguments from map
         String targetRegistryAddress = (String) arguments.get("targetRegistryAddress");
@@ -62,7 +63,7 @@ public class NodeImpl implements Node, Runnable {
         int registryPort = (Integer) arguments.get("registryPort");
         String nodeName = (String) arguments.get("nodeName");
         debug = (boolean) arguments.get("debug");
-        boolean development = (boolean) arguments.get("development");
+        int waitTime = (Integer) arguments.get("waitTime");
         String hostname = (String) arguments.get("hostname");
         if (debug) {
             Configurator.setRootLevel(Level.DEBUG);
@@ -87,7 +88,24 @@ public class NodeImpl implements Node, Runnable {
         } else {
             logger.info("Trying to connect to {} with registry " +
                     "on {}:{}.",target,targetRegistryAddress,targetRegistryPort);
-            nodeImpl.connectToAnotherNode(target, targetRegistryAddress, targetRegistryPort);
+            boolean succes = false;
+            for(int i = 0; i < 5;i++) {
+                succes = nodeImpl.connectToAnotherNode(target, targetRegistryAddress, targetRegistryPort);
+                if(succes)
+                    break;
+                if(i!=4){
+                    Main m = new Main();
+                    synchronized (m) {
+                        logger.warn("Could not establish connection, trying again.");
+                        m.wait(waitTime);
+                    }
+                }
+            }
+            if(!succes){
+                logger.fatal("Could not establish connection with {}:{}. Try it again or change " +
+                        "target to which you are trying to connect.", targetRegistryAddress, targetRegistryPort);
+                System.exit(1);
+            }
         }
         nodeImpl.run();
     }
@@ -113,15 +131,14 @@ public class NodeImpl implements Node, Runnable {
      * @param targetRegistryPort    port cilovych rmi registru
      *                              připojení nodu k jinému nodu, který je vystavený v RMI registrech
      */
-    private void connectToAnotherNode(String target, String targetRegistryAddress, int targetRegistryPort) {
+    private boolean connectToAnotherNode(String target, String targetRegistryAddress, int targetRegistryPort) {
         try {
             Registry registry = LocateRegistry.getRegistry(targetRegistryAddress, targetRegistryPort);
             Node node = (Node) registry.lookup(target);
             node.join(this.name, this);
+            return true;
         } catch (RemoteException | NotBoundException e) {
-            logger.error(String.format("Could not establish connection with %s:%s. Try it again or change " +
-                    "target to which you are trying to connect.", targetRegistryAddress, targetRegistryPort));
-            System.exit(1);
+            return false;
         }
     }
 
@@ -529,7 +546,6 @@ public class NodeImpl implements Node, Runnable {
                     default:
                         printHelp();
                 }
-                waitCustom(2);
                 this.executeTask(task);
             } catch (RemoteException e) {
                 logger.error("Topology is damaged.");
