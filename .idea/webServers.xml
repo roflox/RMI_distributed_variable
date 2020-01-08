@@ -2,8 +2,16 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="5cebe42a-6f7d-4da5-b216-a933afa45a21" name="virt1" url="http://192.168.56.111">
-        <fileTransfer host="192.168.56.111" port="22" rootFolder="/home/dsv" accessType="SFTP">
+      <webServer id="5cebe42a-6f7d-4da5-b216-a933afa45a21" name="virt1" url="http://192.168.56.102">
+        <fileTransfer host="192.168.56.102" port="22" rootFolder="/home/dsv" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="0e82ea1f-6bbe-4c40-baa8-f2b4f0a51b08" name="virt2" url="http://192.168.56.103">
+        <fileTransfer host="192.168.56.103" port="22" rootFolder="/home/dsv" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>

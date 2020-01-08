@@ -1,3 +1,3 @@
 #!/bin/bash
 
-java -jar ../target/nodeImpl-jar-with-dependencies.jar -n Node3 -p 50000 -r 1100 -t Node2 -P 1099 -h 192.168.56.111
+java -jar ../target/nodeImpl-jar-with-dependencies.jar -n Node2 -p 50000 -r 1099 -h 192.168.56.103 -A 192.168.56.102 -t Node2 -P 1099

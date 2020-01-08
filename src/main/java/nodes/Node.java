@@ -69,7 +69,7 @@ public interface Node extends Remote {
 
     void disconnect() throws RemoteException;
 
-    boolean isAlive() throws RemoteException;
+    void ping() throws RemoteException;
 
     Map<Integer, Node> getNodes(int starter_id) throws RemoteException;
 

@@ -17,7 +17,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Set;
 import java.util.*;
 
 public class NodeImpl implements Node, Runnable {
@@ -191,9 +190,11 @@ public class NodeImpl implements Node, Runnable {
             return false;
         }
         if (!isHealthy()) {
+            logger.warn("Node is not healthy.");
             boolean l;
             try {
-                l = leader.isAlive();
+                leader.ping();
+                l= true;
             } catch (RemoteException e) {
                 l = false;
             }
@@ -393,9 +394,11 @@ public class NodeImpl implements Node, Runnable {
     }
 
     public boolean isHealthy() {
+        if(left_id==id)
+            return true;
         try {
-            this.right.isAlive();
-            this.left.isAlive();
+            this.right.ping();
+            this.left.ping();
         } catch (RemoteException e) {
             return false;
         }
@@ -443,8 +446,7 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public boolean isAlive() {
-        return true;
+    public void ping() {
     }
 
     @Override
