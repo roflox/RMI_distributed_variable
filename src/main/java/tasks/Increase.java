@@ -14,8 +14,4 @@ public class Increase extends Task {
         super.execute(node);
         node.variable += integer;
     }
-    @Override
-    public String toString(){
-        return this.getClass() + ", created by "+ starter_id;
-    }
 }

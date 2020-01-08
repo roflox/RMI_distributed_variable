@@ -59,6 +59,6 @@ public abstract class Task implements Serializable {
 
     @Override
     public String toString() {
-        return className + ", created by " + starter_id;
+        return className + ", created by " + starter_id + ", logicalTime: "+logicalTime;
     }
 }
