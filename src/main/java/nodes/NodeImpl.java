@@ -152,6 +152,7 @@ public class NodeImpl implements Node, Runnable {
      */
     private void becomeLeader() {
         logicalTime++;
+        logger.info("This node is now leader.");
         taskQueue = new ArrayList<>();
         if (allNodes.isEmpty()) {
             if (id == 0) {
@@ -527,47 +528,6 @@ public class NodeImpl implements Node, Runnable {
             }
             this.leader.executeTask(new tasks.Set(variable, id, logicalTime));
         }
-        working = false;
-
-//        working = true;
-//        try {
-//
-//            if (!isLeader && task.getStarter() != id) { // toto ani nevim proc tu je :D
-//                working = true;
-////                waitCustom(2);
-//                task.execute(this);
-//            } else if (leader.isExecutable(task)) { // pro leadera
-//                logger.debug("{} is executable.", task);
-//
-//                if (isLeader) { // toto rika leaderovi ze ma executnout ty tasky na "poddanych" nebo jak je nazvat
-//                    logger.debug("leader going to execute");
-//                    working = true;
-//                    if (task.getLogicalTime() > this.logicalTime) {
-//                        this.logicalTime = task.getLogicalTime() + 1;
-//                    } else {
-//                        this.logicalTime++;
-//                    }
-//                    for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
-//                        if (task.getStarter() != n.getKey() && !n.getValue().isLeader()) { //toto je tu aby se to nezacyklilo, aby si leader nedal znova za ukol ten task, a nebo aby to nedal za ukol starterovi
-//                            logger.debug("executing on {}",n.getKey());
-//                            task.setLogicalTime(logicalTime++);
-//                            n.getValue().executeTask(task);
-//                        }
-//                    }
-//                } else { // pro startera
-//                    this.leader.executeTask(task);
-////                    working = true;
-//                }
-//                task.execute(this); // jo jasne, toto je to pro leadera a pro startera
-//            }
-//        } catch (RemoteException e) {
-//            if (isLeader) {
-//                repairRing(true);
-//            } else {
-//                repairRing(false);
-//            }
-//            this.leader.executeTask(new tasks.Set(variable, id, logicalTime));
-//        }
         working = false;
         executeQueue();
     }
