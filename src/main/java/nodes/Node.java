@@ -15,7 +15,7 @@ public interface Node extends Remote {
      * @param node samotný nodes.Node, který se připojuje do systému
      * @throws RemoteException -
      */
-    void join(String name, Node node) throws RemoteException;
+    boolean join(String name, Node node) throws RemoteException;
 
     /**
      * @param right nový node, který bude označený jako next

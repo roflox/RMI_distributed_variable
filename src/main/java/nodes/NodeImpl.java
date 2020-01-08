@@ -37,6 +37,7 @@ public class NodeImpl implements Node, Runnable {
     private boolean working = false;
     boolean isLeader = false;
     List<Task> taskQueue;
+    boolean isConnected = false;
 
 
     public NodeImpl(String name, Registry registry, int objectPort) {
@@ -75,6 +76,9 @@ public class NodeImpl implements Node, Runnable {
         System.setProperty("java.rmi.server.hostname", hostname);
 
         logger.debug("Running in debug mode.");
+        logger.debug("nodeName:{}, hostnane:{}, port:{}, registryPort:{}," +
+                "target:{},targetRegistryAddress:{},targetRegistryPort:{}",nodeName,hostname,port,
+                registryPort,target,targetRegistryAddress,targetRegistryPort);
         // create own registry
         Registry registry = null;
         try {
@@ -138,8 +142,7 @@ public class NodeImpl implements Node, Runnable {
         try {
             Registry registry = LocateRegistry.getRegistry(targetRegistryAddress, targetRegistryPort);
             Node node = (Node) registry.lookup(target);
-            node.join(this.name, this);
-            return true;
+            return node.join(this.name, this);
         } catch (RemoteException | NotBoundException e) {
             return false;
         }
@@ -180,8 +183,11 @@ public class NodeImpl implements Node, Runnable {
      * @throws RemoteException připojení nodu, do klusteru
      */
     @Override
-    public synchronized void join(String name, Node node) throws RemoteException {
+    public synchronized boolean join(String name, Node node) throws RemoteException {
         logger.info(String.format("%s is connecting.", name));
+        if(leader==null){
+            return false;
+        }
         node.setLeader(new Pair<>(leader_id, leader));
         leader.addNode(node);
         node.setRight(new Pair<>(right_id, right));
@@ -191,6 +197,7 @@ public class NodeImpl implements Node, Runnable {
         right_id = node.getId();
         node.executeTask(new tasks.Set(variable, id));
         logger.info(String.format("%s is connected.", name));
+        return true;
 //        if (debug) {
 //            node.printInfo();
 //            node.getRight().getValue().printInfo();
@@ -375,13 +382,13 @@ public class NodeImpl implements Node, Runnable {
     public void repairRing(boolean aliveLeader) throws RemoteException {
         Node lookRight = this.look(null, Path.right);
         Node lookLeft = this.look(null, Path.left);
-        logger.error("Topology is broken. Repair process is started. Alive leader:" + aliveLeader);
+        logger.warn("Topology is broken. Repair process is started. Alive leader:" + aliveLeader);
         if (!lookLeft.equals(lookRight) || !isHealthy()) {
             lookLeft.setLeft((new Pair<>(lookRight.getId(), lookRight)));
             lookRight.setRight((new Pair<>(lookLeft.getId(), lookLeft)));
 
         }
-        logger.error("Topology should be repaired. Gonna start election: " + !aliveLeader);
+        logger.warn("Topology should be repaired. Gonna start election: " + !aliveLeader);
         if (aliveLeader)
             this.leader.gatherNodes();
         else
@@ -407,7 +414,7 @@ public class NodeImpl implements Node, Runnable {
             var newLeader = right.getLeader();
             logger.info("Newly elected leader is: " + newLeader.getKey());
         }
-        logger.info(String.format("%s is disconnecting.", name));
+        logger.warn("{} is disconnecting.", name);
 
         System.exit(1);
     }
@@ -548,9 +555,12 @@ public class NodeImpl implements Node, Runnable {
                         case "d":
                             executeQueue();
                             break;
+                        case "help":
+                        case "h":
+                            printHelp();
                         default:
 //                            printHelp();
-                            logger.warn("Command {} is not recognized. Hit enter to display help.", command);
+                            logger.warn("Command {} is not recognized. Hit type h or help to display help.", command);
                     }
 
                     this.executeTask(task);
@@ -647,7 +657,7 @@ public class NodeImpl implements Node, Runnable {
                 for (Task queued : taskQueue) {
                     sb.append(queued).append(", ");
                 }
-                logger.debug("Queued tasks:\n" + sb.toString());
+                logger.debug("Queued tasks:" + sb.toString());
             }
         }
     }
