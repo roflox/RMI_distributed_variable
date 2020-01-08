@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class ConsoleArgumentParser {
 
-    static Map<String, Object> parse(String[] args) {
+    static Map<String, Object> parseInit(String[] args) {
         Options options = new Options();
         createOptions("n", "name", true, "Name of your node, which will be written into RMI registry. REQUIRED", true, options);
         createOptions("h", "hostname", true, "Ip address of current node. It is recommended to be used, remote nodes may not connect.", false, options);
@@ -83,6 +83,10 @@ public class ConsoleArgumentParser {
             System.exit(1);
         }
         return map;
+    }
+
+    static Map<String, Object> parseRunning(String[] args) {
+        return null;
     }
 
     /**

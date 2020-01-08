@@ -2,14 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fb126565-4587-42e0-a95a-607aa9c566a1" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/Bulk.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/Bulk.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/webServers.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webServers.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/Node1.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/Node3.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/nodes/ConsoleArgumentParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/nodes/ConsoleArgumentParser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/nodes/Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/nodes/Node.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/nodes/NodeImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/nodes/NodeImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/log4j2.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/log4j2.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/nodeImpl-jar-with-dependencies.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/nodeImpl-jar-with-dependencies.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tasks/Decrease.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tasks/Decrease.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tasks/Increase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tasks/Increase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tasks/Random.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tasks/Random.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tasks/Set.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tasks/Set.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tasks/Task.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tasks/Task.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tasks/Wipe.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tasks/Wipe.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,7 +82,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/scripts" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="project.structure.last.edited" value="Modules" />
@@ -89,21 +93,25 @@
     <property name="settings.editor.selected.configurable" value="web.server" />
   </component>
   <component name="RecentsManager">
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="oparations" />
-      <recent name="" />
-    </key>
-    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
-      <recent name="" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
       <recent name="C:\School\DSV\RMI_distributed_variable\src\main\resources" />
       <recent name="C:\School\DSV\RMI_distributed_variable\src\main" />
       <recent name="C:\School\DSV\RMI_distributed_variable\src\test" />
       <recent name="C:\School\DSV\RMI_distributed_variable\src" />
     </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/scripts" />
+    </key>
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="oparations" />
+      <recent name="" />
+    </key>
   </component>
-  <component name="RunManager" selected="Application.Node1_with_virt">
+  <component name="RunManager" selected="Compound.Bulk">
     <configuration name="Empty Node" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="nodes.NodeImpl" />
       <module name="RMI_distributed_variable" />
@@ -217,7 +225,9 @@
       <workItem from="1578250578981" duration="6090000" />
       <workItem from="1578347768169" duration="10692000" />
       <workItem from="1578438947108" duration="1790000" />
-      <workItem from="1578474059275" duration="3304000" />
+      <workItem from="1578474059275" duration="3666000" />
+      <workItem from="1578480530130" duration="1607000" />
+      <workItem from="1578484744462" duration="11354000" />
     </task>
     <task id="LOCAL-00001" summary="fungujici vytvorene spojeni mezi dvemi nody">
       <created>1575557603286</created>
@@ -310,7 +320,14 @@
       <option name="project" value="LOCAL" />
       <updated>1578416645503</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="pridan cas na cekani kdyz neni okamzite nalezen node ke kteremu se pripojuju">
+      <created>1578477605054</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1578477605054</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -343,12 +360,12 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1032" y="181" key="#Project_Structure/0.0.1920.1040@0.0.1920.1040" timestamp="1577121897879" />
-    <state x="608" y="396" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1578476407888">
+    <state x="608" y="396" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1578481657316">
       <screen x="62" y="27" width="1858" height="1053" />
     </state>
     <state x="470" y="61" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1577026990615" />
     <state x="508" y="89" key="#com.intellij.execution.impl.EditConfigurationsDialog/50.27.1870.1053@50.27.1870.1053" timestamp="1578352025079" />
-    <state x="608" y="396" key="#com.intellij.execution.impl.EditConfigurationsDialog/62.27.1858.1053@62.27.1858.1053" timestamp="1578476407888" />
+    <state x="608" y="396" key="#com.intellij.execution.impl.EditConfigurationsDialog/62.27.1858.1053@62.27.1858.1053" timestamp="1578481657316" />
     <state x="795" y="265" width="374" height="584" key="#com.intellij.ide.util.MemberChooser" timestamp="1578233834476">
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
@@ -366,10 +383,11 @@
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
     <state x="742" y="439" width="486" height="248" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/50.27.1870.1053@50.27.1870.1053" timestamp="1578176039474" />
-    <state x="308" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1576006702752">
-      <screen x="0" y="0" width="1920" height="1040" />
+    <state x="360" y="27" width="1532" height="1053" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1578490247953">
+      <screen x="62" y="27" width="1858" height="1053" />
     </state>
     <state x="308" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1576006702752" />
+    <state x="360" y="27" width="1532" height="1053" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/62.27.1858.1053@62.27.1858.1053" timestamp="1578490247953" />
     <state x="852" y="337" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog" timestamp="1575474348471">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -383,11 +401,12 @@
       <screen x="50" y="27" width="1870" height="1053" />
     </state>
     <state x="722" y="408" width="515" height="298" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/50.27.1870.1053@50.27.1870.1053" timestamp="1578188955295" />
-    <state x="368" y="144" width="945" height="816" key="CommitChangelistDialog2" timestamp="1578419639667">
-      <screen x="50" y="27" width="1870" height="1053" />
+    <state x="378" y="144" width="945" height="816" key="CommitChangelistDialog2" timestamp="1578477603630">
+      <screen x="62" y="27" width="1858" height="1053" />
     </state>
     <state x="327" y="116" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1576349655314" />
     <state x="368" y="144" width="945" height="816" key="CommitChangelistDialog2/50.27.1870.1053@50.27.1870.1053" timestamp="1578419639667" />
+    <state x="378" y="144" key="CommitChangelistDialog2/62.27.1858.1053@62.27.1858.1053" timestamp="1578477603630" />
     <state x="876" y="298" key="DetectedRootsChooserDialog" timestamp="1575474370452">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -397,50 +416,54 @@
     </state>
     <state x="902" y="337" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1576613607448" />
     <state x="935" y="368" width="424" height="491" key="FileChooserDialogImpl/62.27.1858.1053@62.27.1858.1053" timestamp="1578474546300" />
-    <state width="882" height="258" key="GridCell.Tab.0.bottom" timestamp="1578477525789">
+    <state width="1812" height="241" key="GridCell.Tab.0.bottom" timestamp="1578496225937">
       <screen x="62" y="27" width="1858" height="1053" />
     </state>
     <state width="1877" height="280" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1577190323106" />
     <state width="1824" height="269" key="GridCell.Tab.0.bottom/50.27.1870.1053@50.27.1870.1053" timestamp="1578419761215" />
-    <state width="882" height="258" key="GridCell.Tab.0.bottom/62.27.1858.1053@62.27.1858.1053" timestamp="1578477525789" />
-    <state width="882" height="258" key="GridCell.Tab.0.center" timestamp="1578477525787">
+    <state width="1812" height="241" key="GridCell.Tab.0.bottom/62.27.1858.1053@62.27.1858.1053" timestamp="1578496225937" />
+    <state width="1812" height="241" key="GridCell.Tab.0.center" timestamp="1578496225936">
       <screen x="62" y="27" width="1858" height="1053" />
     </state>
     <state width="1877" height="280" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1577190323106" />
     <state width="1824" height="269" key="GridCell.Tab.0.center/50.27.1870.1053@50.27.1870.1053" timestamp="1578419761214" />
-    <state width="882" height="258" key="GridCell.Tab.0.center/62.27.1858.1053@62.27.1858.1053" timestamp="1578477525787" />
-    <state width="882" height="258" key="GridCell.Tab.0.left" timestamp="1578477525786">
+    <state width="1812" height="241" key="GridCell.Tab.0.center/62.27.1858.1053@62.27.1858.1053" timestamp="1578496225936" />
+    <state width="1812" height="241" key="GridCell.Tab.0.left" timestamp="1578496225936">
       <screen x="62" y="27" width="1858" height="1053" />
     </state>
     <state width="1877" height="280" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1577190323106" />
     <state width="1824" height="269" key="GridCell.Tab.0.left/50.27.1870.1053@50.27.1870.1053" timestamp="1578419761213" />
-    <state width="882" height="258" key="GridCell.Tab.0.left/62.27.1858.1053@62.27.1858.1053" timestamp="1578477525786" />
-    <state width="882" height="258" key="GridCell.Tab.0.right" timestamp="1578477525788">
+    <state width="1812" height="241" key="GridCell.Tab.0.left/62.27.1858.1053@62.27.1858.1053" timestamp="1578496225936" />
+    <state width="1812" height="241" key="GridCell.Tab.0.right" timestamp="1578496225937">
       <screen x="62" y="27" width="1858" height="1053" />
     </state>
     <state width="1877" height="280" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1577190323106" />
     <state width="1824" height="269" key="GridCell.Tab.0.right/50.27.1870.1053@50.27.1870.1053" timestamp="1578419761214" />
-    <state width="882" height="258" key="GridCell.Tab.0.right/62.27.1858.1053@62.27.1858.1053" timestamp="1578477525788" />
-    <state width="1824" height="340" key="GridCell.Tab.1.bottom" timestamp="1578417957118">
-      <screen x="50" y="27" width="1870" height="1053" />
+    <state width="1812" height="241" key="GridCell.Tab.0.right/62.27.1858.1053@62.27.1858.1053" timestamp="1578496225937" />
+    <state width="1812" height="340" key="GridCell.Tab.1.bottom" timestamp="1578493522947">
+      <screen x="62" y="27" width="1858" height="1053" />
     </state>
     <state width="1877" height="280" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1576067770703" />
     <state width="1824" height="340" key="GridCell.Tab.1.bottom/50.27.1870.1053@50.27.1870.1053" timestamp="1578417957118" />
-    <state width="1824" height="340" key="GridCell.Tab.1.center" timestamp="1578417957117">
-      <screen x="50" y="27" width="1870" height="1053" />
+    <state width="1812" height="340" key="GridCell.Tab.1.bottom/62.27.1858.1053@62.27.1858.1053" timestamp="1578493522947" />
+    <state width="1812" height="340" key="GridCell.Tab.1.center" timestamp="1578493522947">
+      <screen x="62" y="27" width="1858" height="1053" />
     </state>
     <state width="1877" height="280" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1576067770703" />
     <state width="1824" height="340" key="GridCell.Tab.1.center/50.27.1870.1053@50.27.1870.1053" timestamp="1578417957117" />
-    <state width="1824" height="340" key="GridCell.Tab.1.left" timestamp="1578417957117">
-      <screen x="50" y="27" width="1870" height="1053" />
+    <state width="1812" height="340" key="GridCell.Tab.1.center/62.27.1858.1053@62.27.1858.1053" timestamp="1578493522947" />
+    <state width="1812" height="340" key="GridCell.Tab.1.left" timestamp="1578493522947">
+      <screen x="62" y="27" width="1858" height="1053" />
     </state>
     <state width="1877" height="280" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1576067770702" />
     <state width="1824" height="340" key="GridCell.Tab.1.left/50.27.1870.1053@50.27.1870.1053" timestamp="1578417957117" />
-    <state width="1824" height="340" key="GridCell.Tab.1.right" timestamp="1578417957117">
-      <screen x="50" y="27" width="1870" height="1053" />
+    <state width="1812" height="340" key="GridCell.Tab.1.left/62.27.1858.1053@62.27.1858.1053" timestamp="1578493522947" />
+    <state width="1812" height="340" key="GridCell.Tab.1.right" timestamp="1578493522947">
+      <screen x="62" y="27" width="1858" height="1053" />
     </state>
     <state width="1877" height="280" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1576067770703" />
     <state width="1824" height="340" key="GridCell.Tab.1.right/50.27.1870.1053@50.27.1870.1053" timestamp="1578417957117" />
+    <state width="1812" height="340" key="GridCell.Tab.1.right/62.27.1858.1053@62.27.1858.1053" timestamp="1578493522947" />
     <state x="490" y="174" key="Maven.ArtifactSearchDialog" timestamp="1575996797151">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -459,11 +482,12 @@
     <state x="602" y="157" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1577030770333" />
     <state x="636" y="186" width="1024" height="852" key="SettingsEditor/50.27.1870.1053@50.27.1870.1053" timestamp="1578164191162" />
     <state x="444" y="227" width="1022" height="737" key="SettingsEditor/62.27.1858.1053@62.27.1858.1053" timestamp="1578475795681" />
-    <state x="349" y="286" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1578418437058">
-      <screen x="50" y="27" width="1870" height="1053" />
+    <state x="359" y="286" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1578477610091">
+      <screen x="62" y="27" width="1858" height="1053" />
     </state>
     <state x="307" y="256" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1576349657930" />
     <state x="349" y="286" width="800" height="535" key="Vcs.Push.Dialog.v2/50.27.1870.1053@50.27.1870.1053" timestamp="1578418437058" />
+    <state x="359" y="286" key="Vcs.Push.Dialog.v2/62.27.1858.1053@62.27.1858.1053" timestamp="1578477610091" />
     <state x="826" y="476" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1575474292094">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -499,28 +523,6 @@
     </state>
     <state x="143" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1576344382900" />
     <state x="189" y="260" width="672" height="687" key="search.everywhere.popup/50.27.1870.1053@50.27.1870.1053" timestamp="1578266176746" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/src/main/java/nodes/NodeImpl.java</url>
-          <line>447</line>
-          <properties class="nodes.NodeImpl" method="executeTask">
-            <option name="EMULATED" value="true" />
-          </properties>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-method">
-          <url>file://$PROJECT_DIR$/src/main/java/nodes/NodeImpl.java</url>
-          <line>620</line>
-          <properties class="nodes.NodeImpl" method="executeQueue">
-            <option name="EMULATED" value="true" />
-          </properties>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/RMI_distributed_variable$Node1.ic" NAME="Node1 Coverage Results" MODIFIED="1578233277236" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />

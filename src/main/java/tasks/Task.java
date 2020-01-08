@@ -9,23 +9,39 @@ public abstract class Task implements Serializable {
     int integer;
     protected int starter_id;
     String className;
+    int logicalTime;
 
-    public Task(int starter_id, String className) {
+    public Task(int starter_id, String className, int logicalTime) {
         this.starter_id = starter_id;
         this.className = className;
     }
 
-    public Task(int integer, int starter_id, String className) {
+    public Task(int integer, int starter_id, String className, int logicalTime) {
         this.integer = integer;
         this.starter_id = starter_id;
         this.className = className;
+        this.logicalTime = logicalTime;
+    }
+
+    public void setLogicalTime(int i) {
+        this.logicalTime = i;
     }
 
     public void execute(NodeImpl node) {
+        if (node.logicalTime < logicalTime)
+            node.logicalTime = logicalTime + 1;
+        else {
+            node.logicalTime++;
+        }
+
     }
 
     public int getStarter() {
         return starter_id;
+    }
+
+    public int getLogicalTime(){
+        return logicalTime;
     }
 
     @Override
