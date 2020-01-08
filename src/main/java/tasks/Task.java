@@ -10,10 +10,16 @@ public abstract class Task implements Serializable {
     protected int starter_id;
     String className;
     int logicalTime;
+    boolean executed = false;
 
     public Task(int starter_id, String className, int logicalTime) {
         this.starter_id = starter_id;
         this.className = className;
+        this.logicalTime = logicalTime;
+    }
+
+    public boolean wasExecuted(){
+        return executed;
     }
 
     public Task(int integer, int starter_id, String className, int logicalTime) {
@@ -27,13 +33,16 @@ public abstract class Task implements Serializable {
         this.logicalTime = i;
     }
 
+    public void markAsExecuted(){
+
+    }
+
     public void execute(NodeImpl node) {
         if (node.logicalTime < logicalTime)
             node.logicalTime = logicalTime + 1;
         else {
             node.logicalTime++;
         }
-
     }
 
     public int getStarter() {

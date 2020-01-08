@@ -194,7 +194,7 @@ public class NodeImpl implements Node, Runnable {
             boolean l;
             try {
                 leader.ping();
-                l= true;
+                l = true;
             } catch (RemoteException e) {
                 l = false;
             }
@@ -394,7 +394,7 @@ public class NodeImpl implements Node, Runnable {
     }
 
     public boolean isHealthy() {
-        if(left_id==id)
+        if (left_id == id)
             return true;
         try {
             this.right.ping();
@@ -414,6 +414,19 @@ public class NodeImpl implements Node, Runnable {
             lookLeft.setLeft((new Pair<>(lookRight.getId(), lookRight)));
             lookRight.setRight((new Pair<>(lookLeft.getId(), lookLeft)));
 
+        }
+        logger.debug(lookLeft);
+        logger.debug(lookRight);
+        if (left_id == id) {
+            this.left = this;
+            this.right = this;
+            this.left_id = id;
+            this.right_id = id;
+            this.leader = this;
+            this.leader_id = id;
+            this.allNodes = new HashMap<>();
+            this.allNodes.put(id, this);
+            aliveLeader = true;
         }
         logger.warn("Topology should be repaired. Gonna start election: " + !aliveLeader);
         if (aliveLeader)
@@ -437,8 +450,11 @@ public class NodeImpl implements Node, Runnable {
         }
         if (isLeader) {
             logger.warn("Disconnecting. Newly elected leader is {}.", right.getLeader().getValue().getName());
-        }else {
+        } else {
             logger.warn("Disconnecting.");
+        }
+        if (right_id != id) {
+            right.getLeader().getValue().gatherNodes();
         }
 
 
@@ -460,40 +476,48 @@ public class NodeImpl implements Node, Runnable {
         return nodes;
     }
 
-    @Override
-    public synchronized void executeTask(Task task) throws RemoteException {
+    private void startTask(Task task) throws RemoteException {
         if (task == null) {
             return;
         }
-        logger.info("Executing task {}.", task);
+        if (working && task.getStarter() == id) { // uz neco dela a user ji neco cpe, posle to leaderovi
+            leader.addTaskToQueue(task);
+            return;
+        }
+        if (isLeader) {
+            if (isExecutable(task)) {
+                executeTask(task);
+            }
+        } else {
+            leader.executeTask(task);
+        }
+
+    }
+
+    @Override
+    public synchronized void executeTask(Task task) throws RemoteException {
         try {
-
-            if (!isLeader && task.getStarter() != id) { // toto ani nevim proc tu je :D
+            if (!isLeader) { // vetev pro ty co jenom prijimaji task
                 working = true;
-//                waitCustom(2);
+                logger.info("Executing task {}.", task);
                 task.execute(this);
-            } else if (leader.isExecutable(task)) { // pro leadera
-
-                if (isLeader) { // toto rika leaderovi ze ma executnout ty tasky na "poddanych" nebo jak je nazvat
+            } else { // vetev pro leadera, ktery vsem preposle ten task
+                logger.info("Executing task {}.", task);
+                if (isExecutable(task)) {
                     working = true;
-                    if (task.getLogicalTime() > this.logicalTime) {
-                        this.logicalTime = task.getLogicalTime() + 1;
-                    } else {
-                        this.logicalTime++;
-                    }
+                    task.markAsExecuted();
                     for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
-                        if (task.getStarter() != n.getKey() && !n.getValue().isLeader()) { //toto je tu aby se to nezacyklilo, aby si leader nedal znova za ukol ten task, a nebo aby to nedal za ukol starterovi
-                            task.setLogicalTime(logicalTime++);
+                        if (task.getLogicalTime() > logicalTime) {
+                            this.logicalTime = task.getLogicalTime();
+                        }
+                        task.setLogicalTime(logicalTime++);
+                        if (n.getKey() != id) {
+                            logger.debug("Executing for {}", n.getKey());
                             n.getValue().executeTask(task);
                         }
                     }
-                } else { // pro startera
-                    this.leader.executeTask(task);
-                    working = true;
+                    task.execute(this);
                 }
-                task.execute(this); // jo jasne, toto je to pro leadera a pro startera
-            } else {
-                leader.addTaskToQueue(task); // tady to dava do fronty
             }
         } catch (RemoteException e) {
             if (isLeader) {
@@ -503,6 +527,47 @@ public class NodeImpl implements Node, Runnable {
             }
             this.leader.executeTask(new tasks.Set(variable, id, logicalTime));
         }
+        working = false;
+
+//        working = true;
+//        try {
+//
+//            if (!isLeader && task.getStarter() != id) { // toto ani nevim proc tu je :D
+//                working = true;
+////                waitCustom(2);
+//                task.execute(this);
+//            } else if (leader.isExecutable(task)) { // pro leadera
+//                logger.debug("{} is executable.", task);
+//
+//                if (isLeader) { // toto rika leaderovi ze ma executnout ty tasky na "poddanych" nebo jak je nazvat
+//                    logger.debug("leader going to execute");
+//                    working = true;
+//                    if (task.getLogicalTime() > this.logicalTime) {
+//                        this.logicalTime = task.getLogicalTime() + 1;
+//                    } else {
+//                        this.logicalTime++;
+//                    }
+//                    for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
+//                        if (task.getStarter() != n.getKey() && !n.getValue().isLeader()) { //toto je tu aby se to nezacyklilo, aby si leader nedal znova za ukol ten task, a nebo aby to nedal za ukol starterovi
+//                            logger.debug("executing on {}",n.getKey());
+//                            task.setLogicalTime(logicalTime++);
+//                            n.getValue().executeTask(task);
+//                        }
+//                    }
+//                } else { // pro startera
+//                    this.leader.executeTask(task);
+////                    working = true;
+//                }
+//                task.execute(this); // jo jasne, toto je to pro leadera a pro startera
+//            }
+//        } catch (RemoteException e) {
+//            if (isLeader) {
+//                repairRing(true);
+//            } else {
+//                repairRing(false);
+//            }
+//            this.leader.executeTask(new tasks.Set(variable, id, logicalTime));
+//        }
         working = false;
         executeQueue();
     }
@@ -515,9 +580,12 @@ public class NodeImpl implements Node, Runnable {
     public boolean isExecutable(Task task) throws RemoteException {
         logger.debug("Checking if {} is executable.", task);
         for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
-            if (!n.getValue().isAvailable() && task.getStarter() != n.getKey()) {
-                logger.warn("Not executable because " + n.getKey() + " is working on something else.");
-                return false;
+
+            if (n.getKey() != id && n.getKey() != task.getStarter()) {
+                if (!n.getValue().isAvailable()) {
+                    logger.warn("Not executable because " + n.getKey() + " is working on something else.");
+                    return false;
+                }
             }
         }
         return true;
@@ -590,8 +658,8 @@ public class NodeImpl implements Node, Runnable {
 //                            printHelp();
                             logger.warn("Command {} is not recognized. Hit type h or help to display help.", command);
                     }
-
-                    this.executeTask(task);
+                    startTask(task);
+//                    this.executeTask(task);
                 }
                 if (debug) {
                     Main m = new Main();
@@ -630,6 +698,10 @@ public class NodeImpl implements Node, Runnable {
         logicalTime++;
         if (isLeader) {
             allNodes = new HashMap<>();
+            if (right_id == id) {
+                allNodes.put(id, this);
+                return;
+            }
             allNodes.putAll(right.getNodes(id));
         }
     }
