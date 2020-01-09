@@ -16,7 +16,7 @@ java -jar ./nodeImpl-jar-with-dependencies.jar -[přepínač]
 
 Lokální přepínače:  
 -n --name                    Jméno objektu v RMI registrech. POVINNÉ.  
--h --hostname                Ip adresa RMI serveru tohoto nodu. V případě, že se nezadá, pokusí se node pingout 8.8.8.8 a podle interfacu ze kterého to lze, pokud nelze nastaví localhost.  
+-h --hostname                Ip adresa RMI serveru tohoto nodu. V případě, že se nezadá, pokusí se node pingout 8.8.8.8 a podle interfacu ze kterého to lze nastaví jeho Ip adresu, pokud nelze nastaví localhost.  
 -p --port                    Port objektu v RMI registrech. POVINNÉ  
 -r --registryPort            Port RMI serveru tohoto nodu. POVINNÉ  
 -d --debug                   Debugovací režim.  
