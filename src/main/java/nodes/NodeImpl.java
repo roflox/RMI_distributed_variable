@@ -12,6 +12,7 @@ import tasks.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -33,10 +34,11 @@ public class NodeImpl implements Node, Runnable {
     String name;
     int id = 0;
     public int variable;
-    private boolean working = false;
+    boolean working = false;
     boolean isLeader = false;
     List<Task> taskQueue;
     public int logicalTime = 0;
+    Thread queueChecker;
 
 
     public NodeImpl(String name, Registry registry, int objectPort) {
@@ -143,6 +145,7 @@ public class NodeImpl implements Node, Runnable {
             Node node = (Node) registry.lookup(target);
             return node.join(this.name, this);
         } catch (RemoteException | NotBoundException e) {
+            logger.debug(e.getMessage());
             return false;
         }
     }
@@ -176,6 +179,8 @@ public class NodeImpl implements Node, Runnable {
             }
         }
         isLeader = true;
+        queueChecker = new Thread(new QueueChecker(logger, this));
+        queueChecker.start();
     }
 
     /**
@@ -208,35 +213,20 @@ public class NodeImpl implements Node, Runnable {
         node.setLeft(new Pair<>(id, this));
         right = node;
         right_id = node.getId();
-        node.executeTask(new tasks.Set(variable, id, logicalTime));
+
         logger.info(String.format("%s is connected.", name));
         return true;
-//        if (debug) {
-//            node.printInfo();
-//            node.getRight().getValue().printInfo();
-//            if (!node.getRight().equals(node.getLeft())) node.getLeft().getValue().printInfo();
-//        }
     }
 
     @Override
-    public Pair<Integer, Node> getLeft() {
-        return new Pair<>(left_id, left);
-    }
-
-    @Override
-    public synchronized void setLeft(Pair<Integer, Node> left) {
+    public void setLeft(Pair<Integer, Node> left) {
         logicalTime++;
         this.left = left.getValue();
         this.left_id = left.getKey();
     }
 
     @Override
-    public Pair<Integer, Node> getRight() {
-        return new Pair<>(right_id, right);
-    }
-
-    @Override
-    public synchronized void setRight(Pair<Integer, Node> right) {
+    public void setRight(Pair<Integer, Node> right) {
         logicalTime++;
         this.right = right.getValue();
         this.right_id = right.getKey();
@@ -246,6 +236,10 @@ public class NodeImpl implements Node, Runnable {
     public synchronized void setLeader(Pair<Integer, Node> leader) {
         this.leader_id = leader.getKey();
         this.leader = leader.getValue();
+        try {
+            this.variable = this.leader.getLocalVariable();
+        } catch (RemoteException e) {
+        }
     }
 
     @Override
@@ -254,23 +248,19 @@ public class NodeImpl implements Node, Runnable {
     }
 
     /**
-     * @throws RemoteException printuje do konzole informace o nodu
+     *
      */
     @Override
-    public void printInfo() throws RemoteException {
+    public void printInfo() {
         StringBuilder sb = new StringBuilder();
         boolean broken = false;
         boolean aliveLeader = true;
-//        sb.append("node_id: ").append(id);
-//        logger.info(sb.toString());
-        sb = new StringBuilder();
         if (this.left != null) {
             try {
                 sb.append("Left: ").append(this.left.getName()).append(" id: ").append(this.left_id).append(", ");
             } catch (RemoteException e) {
                 sb.append("Left node is dead, ");
                 broken = true;
-//                sb.append("New Left node is:").append(this.left.getName()).append(", ");
             }
         }
         if (this.right != null) {
@@ -279,7 +269,6 @@ public class NodeImpl implements Node, Runnable {
             } catch (RemoteException e) {
                 sb.append("Right node is dead");
                 broken = true;
-//                sb.append("New Right node is:").append(this.right.getName()).append(", ");
             }
         }
         logger.info(sb.toString());
@@ -313,6 +302,7 @@ public class NodeImpl implements Node, Runnable {
         logger.info("Time: {}", logicalTime);
         if (isLeader)
             printQueue();
+        logger.debug("Working:{}.", working);
         if (broken) {
             this.repairRing(aliveLeader);
         }
@@ -407,33 +397,41 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public void repairRing(boolean aliveLeader) throws RemoteException {
-        Node lookRight = this.look(null, Path.right, logicalTime);
-        Node lookLeft = this.look(null, Path.left, logicalTime);
-        logger.warn("Topology is broken. Repair process is started. Alive leader:" + aliveLeader);
-        if (!lookLeft.equals(lookRight) || !isHealthy()) {
-            lookLeft.setLeft((new Pair<>(lookRight.getId(), lookRight)));
-            lookRight.setRight((new Pair<>(lookLeft.getId(), lookLeft)));
-
+    public void repairRing(boolean aliveLeader) {
+        for (int i = 0; i < 5; i++) {
+            try {
+                Node lookRight = this.look(null, Path.right, logicalTime);
+                Node lookLeft = this.look(null, Path.left, logicalTime);
+                logger.warn("Topology is broken. Repair process is started. Alive leader:" + aliveLeader);
+                if (!lookLeft.equals(lookRight) || !isHealthy()) {
+                    lookLeft.setLeft((new Pair<>(lookRight.getId(), lookRight)));
+                    lookRight.setRight((new Pair<>(lookLeft.getId(), lookLeft)));
+                }
+                logger.debug(lookLeft);
+                logger.debug(lookRight);
+                if (left_id == id) {
+                    this.left = this;
+                    this.right = this;
+                    this.left_id = id;
+                    this.right_id = id;
+                    this.leader = this;
+                    this.leader_id = id;
+                    this.allNodes = new HashMap<>();
+                    this.allNodes.put(id, this);
+                    aliveLeader = true;
+                }
+                logger.warn("Topology should be repaired. Gonna start election: " + !aliveLeader);
+                if (aliveLeader)
+                    this.leader.gatherNodes();
+                else
+                    election();
+                return;
+            } catch (RemoteException e) {
+                logger.warn("Ring could not be repaired. Trying again. Remaining attempts {}.", 4 - i);
+            }
         }
-        logger.debug(lookLeft);
-        logger.debug(lookRight);
-        if (left_id == id) {
-            this.left = this;
-            this.right = this;
-            this.left_id = id;
-            this.right_id = id;
-            this.leader = this;
-            this.leader_id = id;
-            this.allNodes = new HashMap<>();
-            this.allNodes.put(id, this);
-            aliveLeader = true;
-        }
-        logger.warn("Topology should be repaired. Gonna start election: " + !aliveLeader);
-        if (aliveLeader)
-            this.leader.gatherNodes();
-        else
-            election();
+        logger.fatal("Fatal error. Ring could not be repaired. Shutting down.");
+        System.exit(1);
     }
 
     @Override
@@ -451,6 +449,7 @@ public class NodeImpl implements Node, Runnable {
         }
         if (isLeader) {
             logger.warn("Disconnecting. Newly elected leader is {}.", right.getLeader().getValue().getName());
+            this.queueChecker.interrupt();
         } else {
             logger.warn("Disconnecting.");
         }
@@ -477,48 +476,13 @@ public class NodeImpl implements Node, Runnable {
         return nodes;
     }
 
-    private void startTask(Task task) throws RemoteException {
-        if (task == null) {
-            return;
-        }
-        if (working && task.getStarter() == id) { // uz neco dela a user ji neco cpe, posle to leaderovi
-            leader.addTaskToQueue(task);
-            return;
-        }
-        if (isLeader) {
-            if (isExecutable(task)) {
-                executeTask(task);
-            }
-        } else {
-            leader.executeTask(task);
-        }
-
-    }
-
-    @Override
-    public synchronized void executeTask(Task task) throws RemoteException {
+    private void startTask(Task task) {
         try {
-            if (!isLeader) { // vetev pro ty co jenom prijimaji task
-                working = true;
-                logger.info("Executing task {}.", task);
-                task.execute(this);
-            } else { // vetev pro leadera, ktery vsem preposle ten task
-                logger.info("Executing task {}.", task);
-                if (isExecutable(task)) {
-                    working = true;
-                    task.markAsExecuted();
-                    for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
-                        if (task.getLogicalTime() > logicalTime) {
-                            this.logicalTime = task.getLogicalTime();
-                        }
-                        task.setLogicalTime(logicalTime++);
-                        if (n.getKey() != id) {
-                            logger.debug("Executing for {}", n.getKey());
-                            n.getValue().executeTask(task);
-                        }
-                    }
-                    task.execute(this);
-                }
+            if (isLeader) {
+                executeTask(task);
+                executeQueue();
+            } else {
+                leader.addTaskToQueue(task);
             }
         } catch (RemoteException e) {
             if (isLeader) {
@@ -526,40 +490,61 @@ public class NodeImpl implements Node, Runnable {
             } else {
                 repairRing(false);
             }
-            this.leader.executeTask(new tasks.Set(variable, id, logicalTime));
+            startTask(task);
         }
-        working = false;
-        executeQueue();
     }
 
-    public boolean isAvailable() {
-        return !working;
+
+    private synchronized void executeTask(Task task) {
+        boolean error;
+        working = true;
+        do {
+            error = false;
+            try {
+                logger.info("Executing task {}", task);
+                for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
+                    if (task.getLogicalTime() > logicalTime) {
+                        this.logicalTime = task.getLogicalTime();
+                    }
+                    task.setLogicalTime(logicalTime++);
+                    if (n.getKey() != id) {
+//                        logger.debug("Executing for {}", n.getKey());
+                        n.getValue().doTask(task);
+                    }
+                }
+
+            } catch (RemoteException e) {
+                repairRing(true);
+                executeTask(new tasks.Set(variable, id, logicalTime));
+                error = true;
+            }
+        } while (error);
+        task.execute(this);
+        working = false;
     }
 
     @Override
-    public boolean isExecutable(Task task) throws RemoteException {
-        logger.debug("Checking if {} is executable.", task);
-        for (Map.Entry<Integer, Node> n : allNodes.entrySet()) {
-
-            if (n.getKey() != id && n.getKey() != task.getStarter()) {
-                if (!n.getValue().isAvailable()) {
-                    logger.warn("Not executable because " + n.getKey() + " is working on something else.");
-                    return false;
-                }
-            }
+    public void doTask(Task t) throws RemoteException {
+        if (t.getLogicalTime() > logicalTime) {
+            logicalTime = t.getLogicalTime();
         }
-        return true;
+        waitCustom(0.2);
+        logicalTime++;
+        logger.info("Executing task {}", t);
+        t.execute(this);
     }
 
     private void printHelp() {
         logger.info("Available commands are:");
-        logger.info("\t\t\ti or info - to print info");
-        logger.info("\t\t\tq or quit - to gently shutdown node");
-        logger.info("\t\t\ta or add - adding 1 to current value of shared variable");
-        logger.info("\t\t\ts or subtract - subtracting 1 from current value of shared variable");
-        logger.info("\t\t\tw or wipe - for setting current value of variable to 0");
-        logger.info("\t\t\tr or random - generate new random variable");
+        logger.info("\t\t\ti or info        - to print info");
+        logger.info("\t\t\tq or quit        - to gently shutdown node");
+        logger.info("\t\t\ta or add         - adding 1 to current value of shared variable");
+        logger.info("\t\t\ts or subtract    - subtracting 1 from current value of shared variable");
+        logger.info("\t\t\tw or wipe        - for setting current value of variable to 0");
+        logger.info("\t\t\tr or random      - generate new random variable");
+        logger.info("\t\t\tt or tasks       - print queue on leader, must be in debug mode");
     }
+
 
     @Override
     public void run() {
@@ -572,6 +557,7 @@ public class NodeImpl implements Node, Runnable {
                 Task task = null;
                 String[] commands = input.split("(?!^)");
                 for (String command : commands) {
+//                    logger.debug(command);
                     switch (command) {
                         case "quit":
                         case "q":
@@ -587,19 +573,19 @@ public class NodeImpl implements Node, Runnable {
                             break;
                         case "add":
                         case "a":
-                            task = new Increase(1, id, logicalTime);
+                            task = new Increase(1, id, ++logicalTime);
                             break;
                         case "subtract":
                         case "s":
-                            task = new Decrease(1, id, logicalTime);
+                            task = new Decrease(1, id, ++logicalTime);
                             break;
                         case "wipe":
                         case "w":
-                            task = new Wipe(id, logicalTime);
+                            task = new Wipe(id, ++logicalTime);
                             break;
                         case "random":
                         case "r":
-                            task = new tasks.Random(id, logicalTime);
+                            task = new tasks.Random(id, ++logicalTime);
                             break;
                         case "debug":
                         case "d":
@@ -614,43 +600,32 @@ public class NodeImpl implements Node, Runnable {
                         case "help":
                         case "h":
                             printHelp();
+                            break;
+                        case "tasks":
+                        case "t":
+                            if(isLeader)
+                                printQueue();
+                            break;
                         default:
-//                            printHelp();
                             logger.warn("Command {} is not recognized. Hit type h or help to display help.", command);
                     }
-                    startTask(task);
-//                    this.executeTask(task);
-                }
-                if (debug) {
-                    Main m = new Main();
-                    synchronized (m) {
-                        try {
-                            m.wait(1000);
-                        } catch (Exception e) {
-
+                    if (task != null) {
+                        if (isLeader) {
+                            addTaskToQueue(task);
+                        } else {
+                            startTask(task);
                         }
                     }
                 }
             } catch (RemoteException e) {
                 logger.error("Topology is damaged.");
                 e.printStackTrace();
-                try {
-                    this.repairRing(false);
-                } catch (RemoteException fe) {
-                    logger.error("Fatal error, ring cannot be repaired");
-                    if (debug)
-                        fe.printStackTrace();
-                }
+                repairRing(false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
         }
-    }
-
-    @Override
-    public boolean isLeader() {
-        return isLeader;
     }
 
     @Override
@@ -667,16 +642,12 @@ public class NodeImpl implements Node, Runnable {
     }
 
     @Override
-    public boolean addTaskToQueue(Task task) throws RemoteException {
-        logger.debug("Queued: {}.", task);
-        printQueue();
-        if (!taskQueue.contains(task)) {
-            taskQueue.add(task);
-            return true;
-        } else {
-            logger.error("Same task is already in the queue!");
-            return false;
-        }
+    public void addTaskToQueue(Task task) {
+//        printQueue();
+        taskQueue.add(task);
+//        if (!working) {
+//            executeQueue();
+//        }
     }
 
     @Override
@@ -684,32 +655,31 @@ public class NodeImpl implements Node, Runnable {
         return new Pair<>(leader_id, leader);
     }
 
-    public void executeQueue() throws RemoteException { // tady nastane zacykleni, a
-        if (isLeader) {
-            if (taskQueue.size() != 0) {
-                logger.debug("Gonna execute queue");
-                Task task = taskQueue.remove(0);
-                while (!isExecutable(task)) {
-                    waitCustom(1);
-                }
-                executeTask(task);
+    @Override
+    public int getLocalVariable() throws RemoteException {
+        return variable;
+    }
+
+    public void executeQueue() { // tady nastane zacykleni, a
+        if (taskQueue.size() != 0) {
+//            printQueue();
+            Task task = taskQueue.remove(0);
+            while (working) {
+                logger.debug("Working, must wait.");
+                waitCustom(1);
             }
+            executeTask(task);
         }
     }
 
-    private void waitSec() {
-        try {
-            wait(500);
-        } catch (Exception e) {
-            logger.error("Cannot wait!");
-        }
-    }
-
-    private void waitCustom(int seconds) {
-        try {
-            wait(seconds * 1000);
-        } catch (Exception e) {
-            logger.error("Cannot wait!");
+    private void waitCustom(double seconds) {
+        synchronized (this) {
+            try {
+                wait((new Double(seconds * 1000)).longValue());
+                logger.debug("Waited for {}s.", seconds);
+            } catch (Exception e) {
+                logger.error("Cannot wait!");
+            }
         }
     }
 

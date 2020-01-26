@@ -61,7 +61,7 @@ public interface Node extends Remote {
 
     void voteLeader(int smallest) throws RemoteException;
 
-    Node look(String starter, Path where,int logicalTime) throws RemoteException;
+    Node look(String starter, Path where, int logicalTime) throws RemoteException;
 
     boolean isHealthy() throws RemoteException;
 
@@ -73,21 +73,13 @@ public interface Node extends Remote {
 
     Map<Integer, Node> getNodes(int starter_id) throws RemoteException;
 
-    void executeTask(Task task) throws RemoteException;
-
-    boolean isAvailable() throws RemoteException;
-
-    boolean isExecutable(Task task) throws RemoteException;
-
-    boolean isLeader() throws RemoteException;
-
     void gatherNodes() throws RemoteException;
 
-    boolean addTaskToQueue(Task t) throws RemoteException;
+    void addTaskToQueue(Task t) throws RemoteException;
+
+    void doTask(Task t) throws RemoteException;
 
     Pair<Integer, Node> getLeader() throws RemoteException;
 
-    Pair<Integer, Node> getLeft() throws RemoteException;
-
-    Pair<Integer, Node> getRight() throws RemoteException;
+    int getLocalVariable() throws RemoteException;
 }

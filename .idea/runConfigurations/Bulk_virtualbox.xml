@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Bulk_virtualbox" type="CompoundRunConfigurationType">
-    <toRun name="Node1_with_virt" type="Application" />
     <toRun name="Node4_with_virt" type="Application" />
     <toRun name="Node5_with_virt" type="Application" />
+    <toRun name="Node1_with_virt" type="Application" />
     <method v="2" />
   </configuration>
 </component>
